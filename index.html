@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#F5F0E8">
+  <title>店長チェック業務</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+```
+body {
+  font-family: 'Söhne', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  background: #FAF9F6;
+  min-height: 100vh;
+  color: #1a1a1a;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 20px 120px;
+}
+
+/* ヘッダー */
+header {
+  padding: 48px 20px 24px;
+  text-align: center;
+  background: #FAF9F6;
+}
+
+header h1 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.date-display {
+  font-size: 0.9rem;
+  color: #6b6b6b;
+  font-weight: 400;
+}
+
+/* シフト選択画面 */
+.shift-select-screen {
+  padding: 40px 0;
+}
+
+.shift-select-screen h2 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.shift-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shift-btn {
+  padding: 20px 24px;
+  background: #FFFFFF;
+  border: 1px solid #E5E2DC;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shift-btn:hover {
+  background: #F5F0E8;
+  border-color: #D4CFC5;
+}
+
+.shift-btn:active {
+  transform: scale(0.98);
+}
+
+.shift-btn .arrow {
+  color: #9b9b9b;
+  font-size: 1.2rem;
+}
+
+.shift-btn .shift-time {
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  font-weight: 400;
+}
+
+/* メイン画面 */
+.main-screen {
+  display: none;
+}
+
+.main-screen.active {
+  display: block;
+}
+
+/* 現在のシフト表示 */
+.current-shift {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #FFFFFF;
+  border: 1px solid #E5E2DC;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.current-shift-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.current-shift-label {
+  font-size: 0.8rem;
+  color: #6b6b6b;
+}
+
+.current-shift-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.change-shift-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #E5E2DC;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.change-shift-btn:hover {
+  background: #F5F0E8;
+}
+
+/* タブ */
+.tabs {
+  display: flex;
+  background: #FFFFFF;
+  border: 1px solid #E5E2DC;
+  border-radius: 12px;
+  margin: 20px 0;
+  padding: 4px;
+  gap: 4px;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px 8px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6b6b6b;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.tab.active {
+  background: #E8E4DB;
+  color: #1a1a1a;
+}
+
+.panel {
+  display: none;
+  animation: fadeIn 0.25s ease;
+}
+
+.panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* プログレス */
+.progress-section {
+  background: #FFFFFF;
+  border: 1px solid #E5E2DC;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progress-label {
+  font-size: 0.85rem;
+  color: #6b6b6b;
+}
+
+.progress-count {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #B8860B;
+}
+
+.progress-bar {
+  height: 4px;
+  background: #E8E4DB;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #B8860B, #DAA520);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* チェックリスト */
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checklist-category {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  padding: 8px 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9b9b9b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #E8E4DB;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E5E2DC;
+  border-radius: 10px;
+  gap: 14px;
+  transition: all 0.2s ease;
+}
+
+.checklist-item:active {
+  transform: scale(0.99);
+}
+
+.checklist-item.checked {
+  background: #F8F6F2;
+  border-color: #D4CFC5;
+}
+
+.custom-checkbox {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  background: #FFFFFF;
+  border-radius: 6px;
+  border: 2px solid #D4CFC5;
+  transition: all 0.2s ease;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background: #B8860B;
+  border-color: #B8860B;
+}
+
+.checkmark::after {
+  content: '';
+  position: absolute;
+  display: none;
+  left: 7px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.custom-checkbox input:checked ~ .checkmark::after {
+  display: block;
+}
+
+.checklist-item label {
+  flex: 1;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.checklist-item.checked label {
+  color: #9b9b9b;
+  text-decoration: line-through;
+}
+
+.day-badge {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  background: #F0EBE3;
+  color: #8B7355;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* 完了ボタン */
+.complete-btn {
+  width: 100%;
+  padding: 16px;
+  background: #B8860B;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.2s ease;
+}
+
+.complete-btn:disabled {
+  background: #E8E4DB;
+  color: #9b9b9b;
+  cursor: not-allowed;
+}
+
+.complete-btn:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+.already-completed {
+  background: #F0EBE3;
+  border: 1px solid #D4CFC5;
+  color: #6b6b6b;
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+/* 項目編集 */
+.edit-section {
+  background: #FFFFFF;
+  border: 1px solid #E5E2DC;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.edit-section h3 {
+  font-size: 0.8rem;
+  color: #6b6b6b;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.shift-tab-select {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.shift-tab {
+  padding: 10px 16px;
+  background: #F5F0E8;
+  border: 1px solid #E5E2DC;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shift-tab.active {
+  background: #E8E4DB;
+  border-color: #B8860B;
+  color: #1a1a1a;
+}
+
+.add-item-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.add-item-form input {
+  flex: 1;
+  padding: 12px 16px;
+  background: #FAF9F6;
+  border: 1px solid #E5E2DC;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  font-family: inherit;
+}
+
+.add-item-form input::placeholder {
+  color: #9b9b9b;
+}
+
+.add-item-form input:focus {
+  outline: none;
+  border-color: #B8860B;
+}
+
+.add-item-form button {
+  padding: 12px 20px;
+  background: #B8860B;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.day-select {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.day-select label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #F5F0E8;
+  border: 1px solid #E5E2DC;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #6b6b6b;
+  cursor: pointer;
+}
+
+.day-select input:checked + span {
+  color: #B8860B;
+  font-weight: 500;
+}
+
+.day-select input {
+  display: none;
+}
+
+.date-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.date-input-row label {
+  font-size: 0.85rem;
+  color: #6b6b6b;
+}
+
+.date-input-row input {
+  padding: 8px 12px;
+  border: 1px solid #E5E2DC;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  width: 60px;
+  text-align: center;
+}
+
+.edit-list {
+  list-style: none;
+}
+
+.edit-list-item {
+  padding: 14px;
+  background: #FAF9F6;
+  border: 1px solid #E5E2DC;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.edit-item-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.edit-item-top .item-text {
+  flex: 1;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  line-height: 1.4;
+}
+
+.edit-item-top .item-days {
+  font-size: 0.75rem;
+  color: #8B7355;
+  background: #F0EBE3;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.edit-item-bottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #E8E4DB;
+}
+
+.edit-item-bottom .move-group {
+  display: flex;
+  gap: 4px;
+}
+
+.edit-item-bottom .action-group {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.edit-list-item button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.move-btn {
+  padding: 6px 12px !important;
+  background: #E8E4DB;
+  color: #6b6b6b;
+  font-size: 0.85rem !important;
+}
+
+.move-btn:active {
+  background: #D4CFC5;
+}
+
+.drag-handle {
+  display: none;
+}
+
+.edit-btn {
+  background: #E8E4DB;
+  color: #6b6b6b;
+}
+
+.delete-btn {
+  background: #FEE;
+  color: #C53030;
+}
+
+/* 履歴 */
+.history-item {
+  background: #FFFFFF;
+  border: 1px solid #E5E2DC;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.history-date {
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.history-shift {
+  font-size: 0.8rem;
+  color: #8B7355;
+  background: #F0EBE3;
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.history-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge.complete {
+  background: #E6F4EA;
+  color: #1E7E34;
+}
+
+.badge.incomplete {
+  background: #FFF3CD;
+  color: #856404;
+}
+
+.history-meta {
+  font-size: 0.8rem;
+  color: #6b6b6b;
+}
+
+.history-details summary {
+  cursor: pointer;
+  padding: 8px 0;
+  color: #B8860B;
+  font-size: 0.85rem;
+}
+
+.history-details ul {
+  padding-left: 0;
+  list-style: none;
+  margin-top: 8px;
+}
+
+.history-details li {
+  padding: 6px 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #F0EBE3;
+  color: #6b6b6b;
+}
+
+.history-details li.checked {
+  color: #1E7E34;
+}
+
+.no-history {
+  text-align: center;
+  padding: 48px 20px;
+  color: #9b9b9b;
+}
+
+.reset-btn {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: #C53030;
+  border: 1px solid #FEE;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+/* モーダル */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.modal h3 {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.modal input[type="text"] {
+  width: 100%;
+  padding: 12px 16px;
+  background: #FAF9F6;
+  border: 1px solid #E5E2DC;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+  font-family: inherit;
+}
+
+.modal .day-select {
+  margin-bottom: 16px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.modal-cancel {
+  background: #E8E4DB;
+  color: #6b6b6b;
+}
+
+.modal-confirm {
+  background: #B8860B;
+  color: white;
+}
+
+/* 完了メッセージ */
+.completion-message {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #FFFFFF;
+  border: 1px solid #E5E2DC;
+  padding: 36px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 300;
+}
+
+.completion-message.active {
+  display: block;
+  animation: popIn 0.3s ease;
+}
+
+.completion-message .icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.completion-message h2 {
+  color: #1E7E34;
+  margin-bottom: 6px;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.completion-message p {
+  color: #6b6b6b;
+  font-size: 0.9rem;
+}
+
+@keyframes popIn {
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+```
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>店長チェック業務</h1>
+    <div class="date-display" id="dateDisplay"></div>
+  </header>
+
+  <div class="container">
+    <!-- シフト選択画面 -->
+    <div class="shift-select-screen" id="shiftSelectScreen">
+      <h2>シフトを選択してください</h2>
+      <div class="shift-buttons">
+        <button class="shift-btn" onclick="selectShift('超早')">
+          <div>
+            <div>超早</div>
+            <div class="shift-time">7:00 - 16:00</div>
+          </div>
+          <span class="arrow">→</span>
+        </button>
+        <button class="shift-btn" onclick="selectShift('早番')">
+          <div>
+            <div>早番</div>
+            <div class="shift-time">9:00 - 18:00</div>
+          </div>
+          <span class="arrow">→</span>
+        </button>
+        <button class="shift-btn" onclick="selectShift('中番')">
+          <div>
+            <div>中番</div>
+            <div class="shift-time">11:00 - 20:00</div>
+          </div>
+          <span class="arrow">→</span>
+        </button>
+        <button class="shift-btn" onclick="selectShift('遅番')">
+          <div>
+            <div>遅番</div>
+            <div class="shift-time">14:30 - 23:30</div>
+          </div>
+          <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+```
+<!-- メイン画面 -->
+<div class="main-screen" id="mainScreen">
+  <div class="current-shift">
+    <div class="current-shift-info">
+      <div>
+        <div class="current-shift-label">現在のシフト</div>
+        <div class="current-shift-name" id="currentShiftName">-</div>
+      </div>
+    </div>
+    <button class="change-shift-btn" onclick="changeShift()">変更</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="check">チェック</button>
+    <button class="tab" data-tab="edit">項目編集</button>
+    <button class="tab" data-tab="history">履歴</button>
+  </div>
+
+  <!-- チェック -->
+  <div class="panel active" id="checkPanel">
+    <div id="alreadyCompleted" class="already-completed" style="display: none;">
+      ✓ 本日のチェックは完了済み
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-header">
+        <span class="progress-label">進捗</span>
+        <span class="progress-count" id="progressText">0/0</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div class="checklist" id="checklist"></div>
+
+    <button class="complete-btn" id="completeBtn" disabled>完了</button>
+  </div>
+
+  <!-- 項目編集 -->
+  <div class="panel" id="editPanel">
+    <div class="edit-section">
+      <h3>シフト選択</h3>
+      <div class="shift-tab-select" id="editShiftTabs"></div>
+
+      <h3>新しい項目を追加</h3>
+      <div class="add-item-form">
+        <input type="text" id="newItemInput" placeholder="チェック項目を入力">
+        <button onclick="addItem()">追加</button>
+      </div>
+
+      <div class="day-select" id="newItemDays">
+        <label><input type="checkbox" value="毎日" checked><span>毎日</span></label>
+        <label><input type="checkbox" value="月"><span>月</span></label>
+        <label><input type="checkbox" value="火"><span>火</span></label>
+        <label><input type="checkbox" value="水"><span>水</span></label>
+        <label><input type="checkbox" value="木"><span>木</span></label>
+        <label><input type="checkbox" value="金"><span>金</span></label>
+        <label><input type="checkbox" value="土"><span>土</span></label>
+        <label><input type="checkbox" value="日"><span>日</span></label>
+      </div>
+
+      <div class="date-input-row">
+        <label>特定日（毎月）:</label>
+        <input type="number" id="newItemDate" min="1" max="31" placeholder="-">
+        <span style="color: #6b6b6b; font-size: 0.85rem;">日</span>
+      </div>
+
+      <h3>項目一覧</h3>
+      <ul class="edit-list" id="editList"></ul>
+    </div>
+  </div>
+
+  <!-- 履歴 -->
+  <div class="panel" id="historyPanel">
+    <div id="historyList"></div>
+    <button class="reset-btn" onclick="resetHistory()">履歴をクリア</button>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- 編集モーダル -->
+
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h3>項目を編集</h3>
+      <input type="text" id="editItemInput">
+      <div class="day-select" id="editItemDays"></div>
+      <div class="date-input-row">
+        <label>特定日:</label>
+        <input type="number" id="editItemDate" min="1" max="31" placeholder="-">
+        <span style="color: #6b6b6b; font-size: 0.85rem;">日</span>
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-cancel" onclick="closeEditModal()">キャンセル</button>
+        <button class="modal-confirm" onclick="confirmEdit()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 完了メッセージ -->
+
+  <div class="completion-message" id="completionMessage">
+    <div class="icon">✓</div>
+    <h2>完了しました</h2>
+    <p>お疲れ様でした</p>
+  </div>
+
+  <script>
+    // ========== データ構造 ==========
+    const STORAGE_KEYS = {
+      items: 'manager_check_items_v2',
+      todayChecks: 'manager_today_checks_v2',
+      history: 'manager_history_v2',
+      lastDate: 'manager_last_date_v2',
+      currentShift: 'manager_current_shift'
+    };
+
+    const SHIFTS = ['超早', '早番', '中番', '遅番'];
+    const DAYS = ['日', '月', '火', '水', '木', '金', '土'];
+
+    const DEFAULT_ITEMS = {
+      '超早': [
+        { text: '開店準備（照明・空調）', days: ['毎日'], date: null },
+        { text: 'レジ釣銭準備', days: ['毎日'], date: null },
+        { text: '店頭清掃', days: ['毎日'], date: null },
+        { text: '納品検品・品出し', days: ['毎日'], date: null },
+        { text: '賞味期限チェック', days: ['毎日'], date: null },
+      ],
+      '早番': [
+        { text: 'レジ金確認', days: ['毎日'], date: null },
+        { text: '売場巡回・整理整頓', days: ['毎日'], date: null },
+        { text: 'POP・値札確認', days: ['毎日'], date: null },
+        { text: '冷蔵庫温度記録', days: ['毎日'], date: null },
+        { text: '発注業務', days: ['月', '水', '金'], date: null },
+        { text: '棚卸し', days: [], date: 25 },
+      ],
+      '中番': [
+        { text: 'レジ応援・混雑対応', days: ['毎日'], date: null },
+        { text: '売場補充', days: ['毎日'], date: null },
+        { text: '在庫整理', days: ['毎日'], date: null },
+        { text: '引き継ぎ確認', days: ['毎日'], date: null },
+      ],
+      '遅番': [
+        { text: 'レジ締め作業', days: ['毎日'], date: null },
+        { text: '売上報告', days: ['毎日'], date: null },
+        { text: '閉店作業（施錠確認）', days: ['毎日'], date: null },
+        { text: '翌日準備確認', days: ['毎日'], date: null },
+        { text: '清掃チェック', days: ['毎日'], date: null },
+        { text: '週報作成', days: ['金'], date: null },
+      ]
+    };
+
+    // ========== 状態 ==========
+    let items = {};
+    let todayChecks = {};
+    let history = [];
+    let currentShift = null;
+    let editingShift = '超早';
+    let editingIndex = -1;
+
+    // ========== ユーティリティ ==========
+    function loadData(key, defaultValue) {
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : defaultValue;
+    }
+
+    function saveData(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function getTodayString() {
+      const today = new Date();
+      return today.toLocaleDateString('ja-JP', { 
+        year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+      });
+    }
+
+    function getTodayKey() {
+      const today = new Date();
+      return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+    }
+
+    function getTodayDayName() {
+      return DAYS[new Date().getDay()];
+    }
+
+    function getTodayDate() {
+      return new Date().getDate();
+    }
+
+    function shouldShowItem(item) {
+      const todayDay = getTodayDayName();
+      const todayDate = getTodayDate();
+
+      if (item.date && item.date === todayDate) return true;
+      if (item.days.includes('毎日')) return true;
+      if (item.days.includes(todayDay)) return true;
+      if (item.days.length === 0 && !item.date) return true;
+
+      return false;
+    }
+
+    function checkDateChange() {
+      const lastDate = localStorage.getItem(STORAGE_KEYS.lastDate);
+      const todayKey = getTodayKey();
+      
+      if (lastDate !== todayKey) {
+        saveData(STORAGE_KEYS.todayChecks, {});
+        localStorage.setItem(STORAGE_KEYS.lastDate, todayKey);
+      }
+    }
+
+    // ========== シフト選択 ==========
+    function selectShift(shift) {
+      currentShift = shift;
+      saveData(STORAGE_KEYS.currentShift, shift);
+      document.getElementById('currentShiftName').textContent = shift;
+      document.getElementById('shiftSelectScreen').style.display = 'none';
+      document.getElementById('mainScreen').classList.add('active');
+      
+      renderChecklist();
+      updateProgress();
+      checkAlreadyCompleted();
+    }
+
+    function changeShift() {
+      document.getElementById('shiftSelectScreen').style.display = 'block';
+      document.getElementById('mainScreen').classList.remove('active');
+    }
+
+    // ========== 初期化 ==========
+    function init() {
+      checkDateChange();
+      
+      items = loadData(STORAGE_KEYS.items, DEFAULT_ITEMS);
+      todayChecks = loadData(STORAGE_KEYS.todayChecks, {});
+      history = loadData(STORAGE_KEYS.history, []);
+      currentShift = loadData(STORAGE_KEYS.currentShift, null);
+
+      document.getElementById('dateDisplay').textContent = getTodayString();
+
+      if (currentShift) {
+        document.getElementById('currentShiftName').textContent = currentShift;
+        document.getElementById('shiftSelectScreen').style.display = 'none';
+        document.getElementById('mainScreen').classList.add('active');
+      }
+
+      renderEditShiftTabs();
+      renderChecklist();
+      renderEditList();
+      renderHistory();
+      updateProgress();
+      checkAlreadyCompleted();
+
+      // タブ
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+      });
+
+      document.getElementById('completeBtn').addEventListener('click', completeCheck);
+
+      // 曜日選択の排他制御
+      setupDaySelectLogic('newItemDays');
+    }
+
+    function setupDaySelectLogic(containerId) {
+      const container = document.getElementById(containerId);
+      const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+      
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+          if (cb.value === '毎日' && cb.checked) {
+            checkboxes.forEach(other => {
+              if (other.value !== '毎日') other.checked = false;
+            });
+          } else if (cb.value !== '毎日' && cb.checked) {
+            const everyday = container.querySelector('input[value="毎日"]');
+            if (everyday) everyday.checked = false;
+          }
+        });
+      });
+    }
+
+    // ========== タブ ==========
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      document.getElementById(`${tabName}Panel`).classList.add('active');
+
+      if (tabName === 'edit') {
+        renderEditList();
+      }
+    }
+
+    // ========== 編集シフトタブ ==========
+    function renderEditShiftTabs() {
+      const container = document.getElementById('editShiftTabs');
+      container.innerHTML = SHIFTS.map(shift => `
+        <button class="shift-tab ${shift === editingShift ? 'active' : ''}" 
+                onclick="switchEditShift('${shift}')">${shift}</button>
+      `).join('');
+    }
+
+    function switchEditShift(shift) {
+      editingShift = shift;
+      renderEditShiftTabs();
+      renderEditList();
+    }
+
+    // ========== チェックリスト ==========
+    function renderChecklist() {
+      const container = document.getElementById('checklist');
+      if (!currentShift || !items[currentShift]) {
+        container.innerHTML = '<p style="color:#9b9b9b;text-align:center;padding:20px;">シフトを選択してください</p>';
+        return;
+      }
+
+      const shiftItems = items[currentShift];
+      const visibleItems = shiftItems.filter(shouldShowItem);
+      
+      container.innerHTML = '';
+
+      visibleItems.forEach((item, idx) => {
+        const originalIndex = shiftItems.indexOf(item);
+        const checkKey = `${currentShift}-${originalIndex}`;
+        const isChecked = todayChecks[checkKey] === true;
+
+        const dayLabel = item.date ? `${item.date}日` : 
+                        (item.days.includes('毎日') ? '' : item.days.join('・'));
+
+        const div = document.createElement('div');
+        div.className = `checklist-item ${isChecked ? 'checked' : ''}`;
+        div.innerHTML = `
+          <div class="custom-checkbox">
+            <input type="checkbox" id="check${originalIndex}" ${isChecked ? 'checked' : ''}>
+            <span class="checkmark"></span>
+          </div>
+          <label for="check${originalIndex}">${item.text}</label>
+          ${dayLabel ? `<span class="day-badge">${dayLabel}</span>` : ''}
+        `;
+
+        const checkbox = div.querySelector('input');
+        checkbox.addEventListener('change', () => toggleCheck(originalIndex));
+
+        container.appendChild(div);
+      });
+
+      if (visibleItems.length === 0) {
+        container.innerHTML = '<p style="color:#9b9b9b;text-align:center;padding:20px;">本日のチェック項目はありません</p>';
+      }
+    }
+
+    function toggleCheck(index) {
+      const checkKey = `${currentShift}-${index}`;
+      todayChecks[checkKey] = !todayChecks[checkKey];
+      saveData(STORAGE_KEYS.todayChecks, todayChecks);
+      renderChecklist();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      if (!currentShift || !items[currentShift]) return;
+
+      const shiftItems = items[currentShift];
+      const visibleItems = shiftItems.filter(shouldShowItem);
+      const total = visibleItems.length;
+      
+      let checked = 0;
+      visibleItems.forEach(item => {
+        const originalIndex = shiftItems.indexOf(item);
+        const checkKey = `${currentShift}-${originalIndex}`;
+        if (todayChecks[checkKey]) checked++;
+      });
+
+      const percent = total > 0 ? (checked / total) * 100 : 0;
+
+      document.getElementById('progressFill').style.width = `${percent}%`;
+      document.getElementById('progressText').textContent = `${checked}/${total}`;
+
+      document.getElementById('completeBtn').disabled = checked < total || total === 0;
+    }
+
+    function checkAlreadyCompleted() {
+      const todayKey = getTodayKey();
+      const todayHistory = history.find(h => 
+        h.dateKey === todayKey && h.shift === currentShift && h.allChecked
+      );
+      
+      document.getElementById('alreadyCompleted').style.display = 
+        todayHistory ? 'block' : 'none';
+    }
+
+    function completeCheck() {
+      const todayKey = getTodayKey();
+      const now = new Date();
+      const shiftItems = items[currentShift];
+      const visibleItems = shiftItems.filter(shouldShowItem);
+
+      const checksForHistory = {};
+      visibleItems.forEach(item => {
+        const idx = shiftItems.indexOf(item);
+        checksForHistory[idx] = todayChecks[`${currentShift}-${idx}`] || false;
+      });
+
+      const record = {
+        dateKey: todayKey,
+        date: getTodayString(),
+        time: now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
+        shift: currentShift,
+        items: visibleItems.map(i => i.text),
+        checks: checksForHistory,
+        allChecked: Object.values(checksForHistory).every(v => v === true)
+      };
+
+      const existingIndex = history.findIndex(h => 
+        h.dateKey === todayKey && h.shift === currentShift
+      );
+      
+      if (existingIndex >= 0) {
+        history[existingIndex] = record;
+      } else {
+        history.unshift(record);
+      }
+
+      saveData(STORAGE_KEYS.history, history);
+      renderHistory();
+      checkAlreadyCompleted();
+
+      const msg = document.getElementById('completionMessage');
+      msg.classList.add('active');
+      setTimeout(() => msg.classList.remove('active'), 2000);
+    }
+
+    // ========== 項目編集 ==========
+    function renderEditList() {
+      const container = document.getElementById('editList');
+      const shiftItems = items[editingShift] || [];
+
+      container.innerHTML = '';
+
+      shiftItems.forEach((item, index) => {
+        const dayLabel = item.date ? `${item.date}日` : 
+                        (item.days.length === 0 ? '条件なし' : item.days.join('・'));
+
+        const li = document.createElement('li');
+        li.className = 'edit-list-item';
+        li.dataset.index = index;
+        li.innerHTML = `
+          <div class="edit-item-top">
+            <span class="item-text">${item.text}</span>
+            <span class="item-days">${dayLabel}</span>
+          </div>
+          <div class="edit-item-bottom">
+            <div class="move-group">
+              <button class="move-btn" onclick="moveItem(${index}, -1)">↑ 上へ</button>
+              <button class="move-btn" onclick="moveItem(${index}, 1)">↓ 下へ</button>
+            </div>
+            <div class="action-group">
+              <button class="edit-btn" onclick="openEditModal(${index})">編集</button>
+              <button class="delete-btn" onclick="deleteItem(${index})">削除</button>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(li);
+      });
+    }
+
+    function moveItem(index, direction) {
+      const shiftItems = items[editingShift];
+      const newIndex = index + direction;
+      
+      if (newIndex < 0 || newIndex >= shiftItems.length) return;
+
+      const temp = shiftItems[index];
+      shiftItems[index] = shiftItems[newIndex];
+      shiftItems[newIndex] = temp;
+
+      saveData(STORAGE_KEYS.items, items);
+      renderEditList();
+      
+      if (editingShift === currentShift) {
+        renderChecklist();
+      }
+    }
+
+    function addItem() {
+      const input = document.getElementById('newItemInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const dayCheckboxes = document.querySelectorAll('#newItemDays input:checked');
+      const days = Array.from(dayCheckboxes).map(cb => cb.value);
+      
+      const dateInput = document.getElementById('newItemDate');
+      const date = dateInput.value ? parseInt(dateInput.value) : null;
+
+      if (!items[editingShift]) items[editingShift] = [];
+      
+      items[editingShift].push({
+        text: text,
+        days: days,
+        date: date
+      });
+
+      saveData(STORAGE_KEYS.items, items);
+      input.value = '';
+      dateInput.value = '';
+
+      // リセット
+      document.querySelectorAll('#newItemDays input').forEach(cb => {
+        cb.checked = cb.value === '毎日';
+      });
+
+      renderEditList();
+      if (editingShift === currentShift) {
+        renderChecklist();
+        updateProgress();
+      }
+    }
+
+    function deleteItem(index) {
+      items[editingShift].splice(index, 1);
+      saveData(STORAGE_KEYS.items, items);
+      renderEditList();
+      
+      if (editingShift === currentShift) {
+        renderChecklist();
+        updateProgress();
+      }
+    }
+
+    function openEditModal(index) {
+      editingIndex = index;
+      const item = items[editingShift][index];
+
+      document.getElementById('editItemInput').value = item.text;
+      document.getElementById('editItemDate').value = item.date || '';
+
+      // 曜日チェックボックスを生成
+      const daysContainer = document.getElementById('editItemDays');
+      const allDays = ['毎日', '月', '火', '水', '木', '金', '土', '日'];
+      daysContainer.innerHTML = allDays.map(d => `
+        <label>
+          <input type="checkbox" value="${d}" ${item.days.includes(d) ? 'checked' : ''}>
+          <span>${d}</span>
+        </label>
+      `).join('');
+
+      setupDaySelectLogic('editItemDays');
+      document.getElementById('editModal').classList.add('active');
+    }
+
+    function closeEditModal() {
+      editingIndex = -1;
+      document.getElementById('editModal').classList.remove('active');
+    }
+
+    function confirmEdit() {
+      const text = document.getElementById('editItemInput').value.trim();
+      if (!text || editingIndex < 0) return;
+
+      const dayCheckboxes = document.querySelectorAll('#editItemDays input:checked');
+      const days = Array.from(dayCheckboxes).map(cb => cb.value);
+      
+      const dateInput = document.getElementById('editItemDate');
+      const date = dateInput.value ? parseInt(dateInput.value) : null;
+
+      items[editingShift][editingIndex] = { text, days, date };
+      saveData(STORAGE_KEYS.items, items);
+
+      closeEditModal();
+      renderEditList();
+      
+      if (editingShift === currentShift) {
+        renderChecklist();
+        updateProgress();
+      }
+    }
+
+    // ========== 履歴 ==========
+    function renderHistory() {
+      const container = document.getElementById('historyList');
+      
+      if (history.length === 0) {
+        container.innerHTML = '<div class="no-history">まだ履歴がありません</div>';
+        return;
+      }
+
+      container.innerHTML = history.slice(0, 50).map(record => {
+        const checkedCount = Object.values(record.checks).filter(v => v).length;
+        const totalCount = record.items.length;
+
+        return `
+          <div class="history-item">
+            <div class="history-date">${record.date}</div>
+            <div class="history-shift">${record.shift}</div>
+            <div class="history-status">
+              <span class="badge ${record.allChecked ? 'complete' : 'incomplete'}">
+                ${record.allChecked ? '完了' : '未完了'}
+              </span>
+              <span class="history-meta">${checkedCount}/${totalCount} • ${record.time}</span>
+            </div>
+            <details class="history-details">
+              <summary>詳細を表示</summary>
+              <ul>
+                ${record.items.map((item, i) => `
+                  <li class="${record.checks[i] ? 'checked' : ''}">
+                    ${record.checks[i] ? '✓' : '−'} ${item}
+                  </li>
+                `).join('')}
+              </ul>
+            </details>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function resetHistory() {
+      history = [];
+      saveData(STORAGE_KEYS.history, history);
+      renderHistory();
+      checkAlreadyCompleted();
+    }
+
+    // ========== 起動 ==========
+    init();
+  </script>
+
+</body>
+</html>
