@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#F5F0E8">
-  <title>店長チェック業務</title>
+  <title>新津店ルーティン業務</title>
   <style>
     * {
       margin: 0;
@@ -39,9 +39,20 @@ header {
 
 header h1 {
   font-size: 1.75rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #1a1a1a;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+  background: linear-gradient(135deg, #B8860B 0%, #DAA520 50%, #B8860B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.version {
+  font-size: 0.7rem;
+  color: #9b9b9b;
+  letter-spacing: 0.1em;
   margin-bottom: 6px;
 }
 
@@ -388,6 +399,25 @@ header h1 {
   text-align: center;
   margin-bottom: 16px;
   font-size: 0.9rem;
+}
+
+.undo-btn {
+  padding: 10px 20px;
+  background: #FFFFFF;
+  border: 1px solid #D4CFC5;
+  border-radius: 8px;
+  color: #6b6b6b;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.undo-btn:hover {
+  background: #F5F0E8;
+}
+
+.undo-btn:active {
+  transform: scale(0.98);
 }
 
 /* 項目編集 */
@@ -824,7 +854,8 @@ header h1 {
 </head>
 <body>
   <header>
-    <h1>店長チェック業務</h1>
+    <h1>新津店ルーティン業務</h1>
+    <div class="version">ver 2026.01.25</div>
     <div class="date-display" id="dateDisplay"></div>
   </header>
 
@@ -886,7 +917,10 @@ header h1 {
   <!-- チェック -->
   <div class="panel active" id="checkPanel">
     <div id="alreadyCompleted" class="already-completed" style="display: none;">
-      ✓ 本日のチェックは完了済み
+      ✓ 本日のチェックは完了しました！<br>
+      <span style="font-size: 0.85rem; color: #8B7355;">明日になるとリセットされます</span>
+      <br><br>
+      <button class="undo-btn" onclick="undoComplete()">もとに戻す</button>
     </div>
 
     <div class="progress-section">
@@ -990,11 +1024,10 @@ header h1 {
 
     const DEFAULT_ITEMS = {
       '超早': [
-        { text: '開店準備（照明・空調）', days: ['毎日'], date: null },
-        { text: 'レジ釣銭準備', days: ['毎日'], date: null },
-        { text: '店頭清掃', days: ['毎日'], date: null },
-        { text: '納品検品・品出し', days: ['毎日'], date: null },
-        { text: '賞味期限チェック', days: ['毎日'], date: null },
+        { text: 'ポスト確認（社員①）', days: ['毎日'], date: null },
+        { text: '青果導入リスト（社員①）', days: ['毎日'], date: null },
+        { text: '7:00朝礼（社員①）', days: ['毎日'], date: null },
+        { text: '取り寄せ発注（社員①）', days: ['毎日'], date: null },
       ],
       '早番': [
         { text: 'レジ金確認', days: ['毎日'], date: null },
@@ -1103,6 +1136,50 @@ header h1 {
       checkDateChange();
       
       items = loadData(STORAGE_KEYS.items, DEFAULT_ITEMS);
+      
+      // すべてのシフトの項目を強制的に新しい内容に上書き
+      items['超早'] = [
+        { text: '社員①７:00朝礼', days: ['毎日'], date: null },
+        { text: '社員①売変（前日夜だが当日出力された場合は実施）', days: ['毎日'], date: null },
+        { text: '社員①取り寄せ発注', days: ['毎日'], date: null },
+        { text: '社員①ポスト確認', days: ['毎日'], date: null },
+        { text: '社員①欠品リスト印刷', days: ['毎日'], date: null },
+        { text: '社員①青果導入リスト印刷', days: ['毎日'], date: null },
+        { text: '社員②8:30朝礼', days: ['毎日'], date: null },
+        { text: '社員②本部便処理', days: ['毎日'], date: null },
+        { text: '社員②販促POP貼（のぼり）', days: ['毎日'], date: null },
+        { text: '社員②水抜き（6/1-9/30）', days: ['毎日'], date: null },
+        { text: '社員②取り寄せ確認（飲料も）', days: ['毎日'], date: null },
+        { text: '社員②１便を８時までに中に入れる', days: ['毎日'], date: null },
+      ];
+      items['早番'] = [
+        { text: '社員③仕分け（飲料品出しのあと）', days: ['毎日'], date: null },
+        { text: '社員③知久屋売上', days: ['毎日'], date: null },
+        { text: '社員③トナー、ラミ確認（日曜日のみ）', days: ['日'], date: null },
+      ];
+      items['中番'] = [];
+      items['遅番'] = [
+        { text: '響きやFAX（月曜のみ）', days: ['月'], date: null },
+        { text: 'HACCAPチェック', days: ['毎日'], date: null },
+        { text: 'お客様の声回収', days: ['毎日'], date: null },
+        { text: '夜売変（値下は閉店後POP設置）', days: ['毎日'], date: null },
+        { text: '【金券】金券、レジマイレシート回収', days: ['毎日'], date: null },
+        { text: '【金券】取り寄せ券、ポイtのカード関連、ipad回収', days: ['毎日'], date: null },
+        { text: '【金券】レジ日報、違算金記入', days: ['毎日'], date: null },
+        { text: '【金券】残業メール作成', days: ['毎日'], date: null },
+        { text: '【現金】レジ両替', days: ['毎日'], date: null },
+        { text: '【現金】金庫内点検', days: ['毎日'], date: null },
+        { text: '【現金】売上金回収', days: ['毎日'], date: null },
+        { text: '【現金】アルソック両替（日、木）', days: ['日', '木'], date: null },
+        { text: '【確認】HACCAP、販売管理記録記入', days: ['毎日'], date: null },
+        { text: '【確認】販促POPとり', days: ['毎日'], date: null },
+        { text: '【確認】青果水抜き（夏）', days: ['毎日'], date: null },
+        { text: '【確認】能動入力', days: ['毎日'], date: null },
+        { text: '【確認】海商報告', days: ['毎日'], date: null },
+        { text: '【確認】青果室でHACCAPサイン', days: ['毎日'], date: null },
+      ];
+      saveData(STORAGE_KEYS.items, items);
+      
       todayChecks = loadData(STORAGE_KEYS.todayChecks, {});
       history = loadData(STORAGE_KEYS.history, []);
       currentShift = loadData(STORAGE_KEYS.currentShift, null);
@@ -1258,8 +1335,22 @@ header h1 {
         h.dateKey === todayKey && h.shift === currentShift && h.allChecked
       );
       
-      document.getElementById('alreadyCompleted').style.display = 
-        todayHistory ? 'block' : 'none';
+      const alreadyMsg = document.getElementById('alreadyCompleted');
+      const checklist = document.getElementById('checklist');
+      const progressSection = document.querySelector('.progress-section');
+      const completeBtn = document.getElementById('completeBtn');
+      
+      if (todayHistory) {
+        alreadyMsg.style.display = 'block';
+        checklist.style.display = 'none';
+        progressSection.style.display = 'none';
+        completeBtn.style.display = 'none';
+      } else {
+        alreadyMsg.style.display = 'none';
+        checklist.style.display = 'flex';
+        progressSection.style.display = 'block';
+        completeBtn.style.display = 'block';
+      }
     }
 
     function completeCheck() {
@@ -1493,6 +1584,26 @@ header h1 {
       saveData(STORAGE_KEYS.history, history);
       renderHistory();
       checkAlreadyCompleted();
+    }
+
+    function undoComplete() {
+      const todayKey = getTodayKey();
+      
+      // 今日の履歴を削除
+      const index = history.findIndex(h => 
+        h.dateKey === todayKey && h.shift === currentShift
+      );
+      
+      if (index >= 0) {
+        history.splice(index, 1);
+        saveData(STORAGE_KEYS.history, history);
+      }
+      
+      // チェックリストを再表示
+      renderChecklist();
+      updateProgress();
+      checkAlreadyCompleted();
+      renderHistory();
     }
 
     // ========== 起動 ==========
