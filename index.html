@@ -2,1613 +2,2270 @@
 
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="theme-color" content="#F5F0E8">
-  <title>新津店ルーティン業務</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F5F0E8">
+<title>新津店ルーティン業務</title>
+<style>
+/* ========================================
+   リセット・基本設定
+======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
 
-```
 body {
-  font-family: 'Söhne', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-  background: #FAF9F6;
-  min-height: 100vh;
-  color: #1a1a1a;
-  line-height: 1.6;
+font-family: -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif;
+background: #FAF9F6;
+min-height: 100vh;
+color: #1a1a1a;
+line-height: 1.6;
+padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* ========================================
+レイアウト
+======================================== */
 .container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 20px 120px;
+max-width: 600px;
+margin: 0 auto;
+padding: 0 20px 120px;
 }
 
-/* ヘッダー */
 header {
-  padding: 48px 20px 24px;
-  text-align: center;
-  background: #FAF9F6;
+padding: 48px 20px 24px;
+text-align: center;
 }
 
 header h1 {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  letter-spacing: 0.05em;
-  margin-bottom: 4px;
-  background: linear-gradient(135deg, #B8860B 0%, #DAA520 50%, #B8860B 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+font-size: 1.75rem;
+font-weight: 600;
+background: linear-gradient(135deg, #B8860B 0%, #DAA520 50%, #B8860B 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+margin-bottom: 4px;
 }
 
 .version {
-  font-size: 0.7rem;
-  color: #9b9b9b;
-  letter-spacing: 0.1em;
-  margin-bottom: 6px;
+font-size: 0.7rem;
+color: #9b9b9b;
+letter-spacing: 0.1em;
 }
 
 .date-display {
-  font-size: 0.9rem;
-  color: #6b6b6b;
-  font-weight: 400;
+font-size: 0.9rem;
+color: #6b6b6b;
+margin-top: 4px;
 }
 
-/* シフト選択画面 */
+/* ========================================
+シフト選択画面
+======================================== */
 .shift-select-screen {
-  padding: 40px 0;
-}
-
-.shift-select-screen h2 {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #1a1a1a;
-  text-align: center;
-  margin-bottom: 32px;
+padding: 40px 0;
 }
 
 .shift-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+display: flex;
+flex-direction: column;
+gap: 12px;
 }
 
 .shift-btn {
-  padding: 20px 24px;
-  background: #FFFFFF;
-  border: 1px solid #E5E2DC;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #1a1a1a;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.shift-btn:hover {
-  background: #F5F0E8;
-  border-color: #D4CFC5;
+padding: 20px 24px;
+background: #fff;
+border: 1px solid #E5E2DC;
+border-radius: 12px;
+font-size: 1rem;
+font-weight: 500;
+cursor: pointer;
+text-align: left;
+display: flex;
+justify-content: space-between;
+align-items: center;
+transition: transform 0.1s, background 0.1s;
 }
 
 .shift-btn:active {
-  transform: scale(0.98);
+transform: scale(0.98);
+background: #F5F0E8;
 }
 
-.shift-btn .arrow {
-  color: #9b9b9b;
-  font-size: 1.2rem;
+.shift-btn .time {
+font-size: 0.85rem;
+color: #6b6b6b;
+font-weight: 400;
 }
 
-.shift-btn .shift-time {
-  font-size: 0.85rem;
-  color: #6b6b6b;
-  font-weight: 400;
-}
-
-/* メイン画面 */
+/* ========================================
+メイン画面
+======================================== */
 .main-screen {
-  display: none;
+display: none;
 }
 
 .main-screen.active {
-  display: block;
+display: block;
 }
 
-/* 現在のシフト表示 */
+.shift-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 20px;
+padding-bottom: 16px;
+border-bottom: 1px solid #E5E2DC;
+}
+
 .current-shift {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  background: #FFFFFF;
-  border: 1px solid #E5E2DC;
-  border-radius: 12px;
-  margin-bottom: 20px;
+font-size: 1.2rem;
+font-weight: 600;
 }
 
-.current-shift-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.change-btn {
+padding: 8px 16px;
+background: transparent;
+border: 1px solid #D4CFC5;
+border-radius: 8px;
+font-size: 0.85rem;
+color: #6b6b6b;
+cursor: pointer;
 }
 
-.current-shift-label {
-  font-size: 0.8rem;
-  color: #6b6b6b;
-}
-
-.current-shift-name {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #1a1a1a;
-}
-
-.change-shift-btn {
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid #E5E2DC;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  color: #6b6b6b;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.change-shift-btn:hover {
-  background: #F5F0E8;
-}
-
-/* タブ */
-.tabs {
-  display: flex;
-  background: #FFFFFF;
-  border: 1px solid #E5E2DC;
-  border-radius: 12px;
-  margin: 20px 0;
-  padding: 4px;
-  gap: 4px;
-}
-
-.tab {
-  flex: 1;
-  padding: 12px 8px;
-  text-align: center;
-  border: none;
-  background: transparent;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #6b6b6b;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.tab.active {
-  background: #E8E4DB;
-  color: #1a1a1a;
-}
-
-.panel {
-  display: none;
-  animation: fadeIn 0.25s ease;
-}
-
-.panel.active {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* プログレス */
+/* ========================================
+プログレスバー
+======================================== */
 .progress-section {
-  background: #FFFFFF;
-  border: 1px solid #E5E2DC;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
-}
-
-.progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.progress-label {
-  font-size: 0.85rem;
-  color: #6b6b6b;
-}
-
-.progress-count {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #B8860B;
+margin-bottom: 24px;
+background: #fff;
+padding: 15px;
+border-radius: 12px;
+border: 1px solid #E5E2DC;
 }
 
 .progress-bar {
-  height: 4px;
-  background: #E8E4DB;
-  border-radius: 2px;
-  overflow: hidden;
+height: 6px;
+background: #E8E4DB;
+border-radius: 3px;
+overflow: hidden;
+margin-bottom: 8px;
 }
 
 .progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #B8860B, #DAA520);
-  border-radius: 2px;
-  transition: width 0.4s ease;
+height: 100%;
+background: linear-gradient(90deg, #B8860B, #DAA520);
+transition: width 0.3s ease;
 }
 
-/* チェックリスト */
+.progress-text {
+font-size: 0.85rem;
+color: #6b6b6b;
+text-align: right;
+font-weight: 600;
+}
+
+/* ========================================
+チェックリスト
+======================================== */
 .checklist {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.checklist-category {
-  margin-top: 16px;
-  margin-bottom: 8px;
-  padding: 8px 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #9b9b9b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid #E8E4DB;
+display: flex;
+flex-direction: column;
+gap: 8px;
 }
 
 .checklist-item {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  background: #FFFFFF;
-  border: 1px solid #E5E2DC;
-  border-radius: 10px;
-  gap: 14px;
-  transition: all 0.2s ease;
-}
-
-.checklist-item:active {
-  transform: scale(0.99);
+display: flex;
+align-items: center;
+padding: 16px;
+background: #fff;
+border: 1px solid #E5E2DC;
+border-radius: 10px;
+gap: 12px;
+transition: background 0.2s, border-color 0.2s;
+cursor: pointer;
+-webkit-user-select: none;
+user-select: none;
 }
 
 .checklist-item.checked {
-  background: #F8F6F2;
-  border-color: #D4CFC5;
+background: #F5F0E8;
+border-color: #D4CFC5;
 }
 
+.checklist-item .item-text {
+flex: 1;
+font-size: 0.95rem;
+}
+
+.checklist-item.checked .item-text {
+color: #8B7355;
+text-decoration: line-through;
+}
+
+/* カスタムチェックボックス */
 .custom-checkbox {
-  position: relative;
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
+position: relative;
+width: 24px;
+height: 24px;
+flex-shrink: 0;
 }
 
 .custom-checkbox input {
-  position: absolute;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-  z-index: 1;
+position: absolute;
+opacity: 0;
+width: 100%;
+height: 100%;
+cursor: pointer;
+z-index: 2;
+margin: 0;
 }
 
 .checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 22px;
-  height: 22px;
-  background: #FFFFFF;
-  border-radius: 6px;
-  border: 2px solid #D4CFC5;
-  transition: all 0.2s ease;
+position: absolute;
+top: 0;
+left: 0;
+width: 24px;
+height: 24px;
+background: #fff;
+border: 2px solid #D4CFC5;
+border-radius: 6px;
+pointer-events: none;
 }
 
-.custom-checkbox input:checked ~ .checkmark {
-  background: #B8860B;
-  border-color: #B8860B;
+.custom-checkbox input:checked + .checkmark {
+background: #B8860B;
+border-color: #B8860B;
 }
 
-.checkmark::after {
-  content: '';
-  position: absolute;
-  display: none;
-  left: 7px;
-  top: 3px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+.custom-checkbox input:checked + .checkmark::after {
+content: ‘’;
+position: absolute;
+left: 7px;
+top: 3px;
+width: 6px;
+height: 11px;
+border: solid white;
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
 }
 
-.custom-checkbox input:checked ~ .checkmark::after {
-  display: block;
-}
-
-.checklist-item label {
-  flex: 1;
-  font-size: 0.95rem;
-  color: #1a1a1a;
-  cursor: pointer;
-}
-
-.checklist-item.checked label {
-  color: #9b9b9b;
-  text-decoration: line-through;
-}
-
+/* 曜日バッジ */
 .day-badge {
-  font-size: 0.7rem;
-  padding: 3px 8px;
-  background: #F0EBE3;
-  color: #8B7355;
-  border-radius: 4px;
-  font-weight: 500;
+font-size: 0.75rem;
+padding: 2px 8px;
+background: #E8E4DB;
+color: #6b6b6b;
+border-radius: 4px;
+margin-left: 8px;
+white-space: nowrap;
+flex-shrink: 0;
 }
 
-/* 完了ボタン */
-.complete-btn {
-  width: 100%;
-  padding: 16px;
-  background: #B8860B;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: all 0.2s ease;
+/* ========================================
+ナビゲーションタブ
+======================================== */
+.nav-tabs {
+position: fixed;
+bottom: 0;
+left: 0;
+right: 0;
+background: #fff;
+border-top: 1px solid #E5E2DC;
+display: flex;
+justify-content: space-around;
+padding: 12px 0;
+z-index: 100;
+padding-bottom: calc(12px + env(safe-area-inset-bottom));
 }
 
-.complete-btn:disabled {
-  background: #E8E4DB;
-  color: #9b9b9b;
-  cursor: not-allowed;
+.tab {
+padding: 8px 20px;
+background: transparent;
+border: none;
+font-size: 0.9rem;
+color: #9b9b9b;
+border-radius: 8px;
+cursor: pointer;
 }
 
-.complete-btn:not(:disabled):active {
-  transform: scale(0.98);
+.tab.active {
+background: #F5F0E8;
+color: #B8860B;
+font-weight: 600;
 }
 
-.already-completed {
-  background: #F0EBE3;
-  border: 1px solid #D4CFC5;
-  color: #6b6b6b;
-  padding: 16px;
-  border-radius: 10px;
-  text-align: center;
-  margin-bottom: 16px;
-  font-size: 0.9rem;
+/* ========================================
+パネル
+======================================== */
+.panel {
+display: none;
 }
 
-.undo-btn {
-  padding: 10px 20px;
-  background: #FFFFFF;
-  border: 1px solid #D4CFC5;
-  border-radius: 8px;
-  color: #6b6b6b;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
+.panel.active {
+display: block;
 }
 
-.undo-btn:hover {
-  background: #F5F0E8;
+/* ========================================
+編集画面
+======================================== */
+.edit-shift-tabs {
+display: flex;
+gap: 8px;
+margin-bottom: 20px;
+flex-wrap: wrap;
 }
 
-.undo-btn:active {
-  transform: scale(0.98);
+.edit-shift-tab {
+padding: 8px 16px;
+background: #fff;
+border: 1px solid #E5E2DC;
+border-radius: 8px;
+font-size: 0.85rem;
+color: #6b6b6b;
+cursor: pointer;
 }
 
-/* 項目編集 */
-.edit-section {
-  background: #FFFFFF;
-  border: 1px solid #E5E2DC;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
+.edit-shift-tab.active {
+background: #B8860B;
+color: #fff;
+border-color: #B8860B;
 }
 
-.edit-section h3 {
-  font-size: 0.8rem;
-  color: #6b6b6b;
-  margin-bottom: 16px;
-  font-weight: 500;
+.add-item-section {
+background: #fff;
+border: 1px solid #E5E2DC;
+border-radius: 12px;
+padding: 16px;
+margin-bottom: 20px;
 }
 
-.shift-tab-select {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.shift-tab {
-  padding: 10px 16px;
-  background: #F5F0E8;
-  border: 1px solid #E5E2DC;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  color: #6b6b6b;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.shift-tab.active {
-  background: #E8E4DB;
-  border-color: #B8860B;
-  color: #1a1a1a;
-}
-
-.add-item-form {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.add-item-form input {
-  flex: 1;
-  padding: 12px 16px;
-  background: #FAF9F6;
-  border: 1px solid #E5E2DC;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  color: #1a1a1a;
-  font-family: inherit;
-}
-
-.add-item-form input::placeholder {
-  color: #9b9b9b;
-}
-
-.add-item-form input:focus {
-  outline: none;
-  border-color: #B8860B;
-}
-
-.add-item-form button {
-  padding: 12px 20px;
-  background: #B8860B;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
+.add-item-section input[type=“text”] {
+width: 100%;
+padding: 12px;
+border: 1px solid #E5E2DC;
+border-radius: 8px;
+font-size: 16px;
+margin-bottom: 12px;
 }
 
 .day-select {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+margin-bottom: 12px;
 }
 
 .day-select label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  background: #F5F0E8;
-  border: 1px solid #E5E2DC;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  color: #6b6b6b;
-  cursor: pointer;
-}
-
-.day-select input:checked + span {
-  color: #B8860B;
-  font-weight: 500;
+display: flex;
+align-items: center;
+gap: 4px;
+padding: 6px 12px;
+background: #F5F0E8;
+border-radius: 6px;
+font-size: 0.85rem;
+cursor: pointer;
 }
 
 .day-select input {
-  display: none;
+display: none;
+}
+
+.day-select input:checked + span {
+color: #B8860B;
+font-weight: 600;
 }
 
 .date-input-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.date-input-row label {
-  font-size: 0.85rem;
-  color: #6b6b6b;
+display: flex;
+align-items: center;
+gap: 8px;
+margin-bottom: 12px;
+font-size: 0.9rem;
+color: #6b6b6b;
 }
 
 .date-input-row input {
-  padding: 8px 12px;
-  border: 1px solid #E5E2DC;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  width: 60px;
-  text-align: center;
+width: 60px;
+padding: 8px;
+border: 1px solid #E5E2DC;
+border-radius: 6px;
+font-size: 16px;
 }
 
+.add-btn {
+width: 100%;
+padding: 12px;
+background: #B8860B;
+color: #fff;
+border: none;
+border-radius: 8px;
+font-size: 0.9rem;
+font-weight: 500;
+cursor: pointer;
+}
+
+/* 編集リスト */
 .edit-list {
-  list-style: none;
+list-style: none;
 }
 
 .edit-list-item {
-  padding: 14px;
-  background: #FAF9F6;
-  border: 1px solid #E5E2DC;
-  border-radius: 8px;
-  margin-bottom: 8px;
+background: #fff;
+border: 1px solid #E5E2DC;
+border-radius: 10px;
+padding: 15px;
+margin-bottom: 10px;
 }
 
 .edit-item-top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+gap: 10px;
 }
 
 .edit-item-top .item-text {
-  flex: 1;
-  font-size: 0.95rem;
-  color: #1a1a1a;
-  line-height: 1.4;
-}
-
-.edit-item-top .item-days {
-  font-size: 0.75rem;
-  color: #8B7355;
-  background: #F0EBE3;
-  padding: 4px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
+flex: 1;
+font-size: 0.95rem;
+word-break: break-word;
 }
 
 .edit-item-bottom {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-top: 10px;
-  border-top: 1px solid #E8E4DB;
+display: flex;
+gap: 8px;
+margin-top: 12px;
+padding-top: 12px;
+border-top: 1px solid #eee;
+flex-wrap: wrap;
 }
 
-.edit-item-bottom .move-group {
-  display: flex;
-  gap: 4px;
+.move-group {
+display: flex;
+gap: 4px;
 }
 
-.edit-item-bottom .action-group {
-  display: flex;
-  gap: 8px;
-  margin-left: auto;
+.action-group {
+display: flex;
+gap: 8px;
+margin-left: auto;
 }
 
-.edit-list-item button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.move-btn {
-  padding: 6px 12px !important;
-  background: #E8E4DB;
-  color: #6b6b6b;
-  font-size: 0.85rem !important;
-}
-
-.move-btn:active {
-  background: #D4CFC5;
-}
-
-.drag-handle {
-  display: none;
-}
-
+.move-btn,
 .edit-btn {
-  background: #E8E4DB;
-  color: #6b6b6b;
+background: #E8E4DB;
+color: #6b6b6b;
+border: none;
+padding: 8px 12px;
+border-radius: 6px;
+font-size: 0.8rem;
+cursor: pointer;
 }
 
 .delete-btn {
-  background: #FEE;
-  color: #C53030;
+color: #C53030;
+background: #FEE;
+border: none;
+padding: 8px 12px;
+border-radius: 6px;
+font-size: 0.8rem;
+cursor: pointer;
 }
 
-/* 履歴 */
+/* ========================================
+完了ボタン
+======================================== */
+.complete-btn {
+width: 100%;
+padding: 18px;
+background: linear-gradient(135deg, #B8860B, #DAA520);
+color: #fff;
+border: none;
+border-radius: 12px;
+font-size: 1rem;
+font-weight: 600;
+margin-top: 20px;
+cursor: pointer;
+transition: transform 0.1s;
+}
+
+.complete-btn:disabled {
+background: #E8E4DB;
+color: #9b9b9b;
+cursor: not-allowed;
+}
+
+.complete-btn:not(:disabled):active {
+transform: scale(0.98);
+}
+
+/* ========================================
+完了済み表示
+======================================== */
+.already-completed {
+background: #E6F4EA;
+padding: 20px;
+border-radius: 10px;
+text-align: center;
+margin-bottom: 15px;
+}
+
+.undo-btn {
+margin-top: 12px;
+font-size: 0.85rem;
+background: #fff;
+border: 1px solid #ccc;
+padding: 8px 16px;
+border-radius: 6px;
+cursor: pointer;
+}
+
+/* ========================================
+履歴画面
+======================================== */
 .history-item {
-  background: #FFFFFF;
-  border: 1px solid #E5E2DC;
-  border-radius: 10px;
-  padding: 16px;
-  margin-bottom: 12px;
+background: #fff;
+border: 1px solid #E5E2DC;
+border-radius: 10px;
+padding: 15px;
+margin-bottom: 10px;
 }
 
 .history-date {
-  font-weight: 500;
-  font-size: 0.95rem;
-  margin-bottom: 8px;
-  color: #1a1a1a;
+font-weight: 600;
+margin-bottom: 4px;
 }
 
 .history-shift {
-  font-size: 0.8rem;
-  color: #8B7355;
-  background: #F0EBE3;
-  padding: 4px 10px;
-  border-radius: 4px;
-  display: inline-block;
-  margin-bottom: 8px;
+font-size: 0.85rem;
+color: #6b6b6b;
+margin-bottom: 8px;
 }
 
 .history-status {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+display: flex;
+align-items: center;
+gap: 10px;
 }
 
 .badge {
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
+padding: 4px 10px;
+border-radius: 4px;
+font-size: 0.8rem;
+font-weight: 500;
 }
 
 .badge.complete {
-  background: #E6F4EA;
-  color: #1E7E34;
+background: #D4EDDA;
+color: #155724;
 }
 
 .badge.incomplete {
-  background: #FFF3CD;
-  color: #856404;
+background: #FFF3CD;
+color: #856404;
 }
 
 .history-meta {
-  font-size: 0.8rem;
-  color: #6b6b6b;
+font-size: 0.8rem;
+color: #9b9b9b;
+}
+
+.history-details {
+margin-top: 10px;
 }
 
 .history-details summary {
-  cursor: pointer;
-  padding: 8px 0;
-  color: #B8860B;
-  font-size: 0.85rem;
+font-size: 0.85rem;
+color: #6b6b6b;
+cursor: pointer;
 }
 
 .history-details ul {
-  padding-left: 0;
-  list-style: none;
-  margin-top: 8px;
+margin-top: 8px;
+padding-left: 20px;
 }
 
 .history-details li {
-  padding: 6px 0;
-  font-size: 0.85rem;
-  border-bottom: 1px solid #F0EBE3;
-  color: #6b6b6b;
+font-size: 0.85rem;
+color: #6b6b6b;
+margin-bottom: 2px;
 }
 
 .history-details li.checked {
-  color: #1E7E34;
+color: #155724;
 }
 
 .no-history {
-  text-align: center;
-  padding: 48px 20px;
-  color: #9b9b9b;
+text-align: center;
+color: #9b9b9b;
+padding: 40px 0;
+}
+
+/* バックアップセクション */
+.backup-section {
+background: #F5F0E8;
+border: 1px solid #E5E2DC;
+border-radius: 10px;
+padding: 16px;
+margin-top: 20px;
+}
+
+.backup-section h4 {
+font-size: 0.9rem;
+margin-bottom: 12px;
+}
+
+.backup-buttons {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.backup-btn,
+.restore-btn {
+padding: 12px;
+border: 1px solid #D4CFC5;
+border-radius: 8px;
+font-size: 0.85rem;
+cursor: pointer;
+text-align: center;
+}
+
+.backup-btn {
+background: #fff;
+}
+
+.restore-btn {
+background: #E8E4DB;
 }
 
 .reset-btn {
-  width: 100%;
-  padding: 14px;
-  background: transparent;
-  color: #C53030;
-  border: 1px solid #FEE;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  margin-top: 16px;
+width: 100%;
+padding: 14px;
+background: transparent;
+color: #C53030;
+border: 1px solid #FCC;
+border-radius: 8px;
+font-size: 0.9rem;
+cursor: pointer;
+margin-top: 20px;
 }
 
-/* モーダル */
+/* ========================================
+モーダル
+======================================== */
 .modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: rgba(0, 0, 0, 0.5);
+z-index: 200;
+align-items: center;
+justify-content: center;
+padding: 20px;
 }
 
-.modal-overlay.active {
-  display: flex;
+.modal-overlay.show {
+display: flex;
 }
 
 .modal {
-  background: #FFFFFF;
-  border-radius: 16px;
-  padding: 24px;
-  width: 100%;
-  max-width: 400px;
+background: #fff;
+border-radius: 16px;
+padding: 24px;
+width: 100%;
+max-width: 400px;
 }
 
 .modal h3 {
-  margin-bottom: 20px;
-  font-size: 1.1rem;
-  font-weight: 500;
+margin-bottom: 16px;
 }
 
-.modal input[type="text"] {
-  width: 100%;
-  padding: 12px 16px;
-  background: #FAF9F6;
-  border: 1px solid #E5E2DC;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #1a1a1a;
-  margin-bottom: 16px;
-  font-family: inherit;
-}
-
-.modal .day-select {
-  margin-bottom: 16px;
+.modal input[type=“text”] {
+width: 100%;
+padding: 12px;
+border: 1px solid #E5E2DC;
+border-radius: 8px;
+font-size: 16px;
+margin-bottom: 12px;
 }
 
 .modal-buttons {
-  display: flex;
-  gap: 10px;
+display: flex;
+gap: 12px;
+margin-top: 16px;
 }
 
-.modal-buttons button {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
+.modal-cancel,
+.modal-confirm {
+flex: 1;
+padding: 12px;
+border-radius: 8px;
+font-size: 0.9rem;
+font-weight: 500;
+cursor: pointer;
+border: none;
 }
 
 .modal-cancel {
-  background: #E8E4DB;
-  color: #6b6b6b;
+background: #E8E4DB;
+color: #6b6b6b;
 }
 
 .modal-confirm {
-  background: #B8860B;
-  color: white;
+background: #B8860B;
+color: #fff;
 }
 
-/* 完了メッセージ */
+/* ========================================
+完了メッセージ
+======================================== */
 .completion-message {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #FFFFFF;
-  border: 1px solid #E5E2DC;
-  padding: 36px;
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  z-index: 300;
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: #FAF9F6;
+z-index: 300;
+justify-content: center;
+align-items: center;
+flex-direction: column;
 }
 
-.completion-message.active {
-  display: block;
-  animation: popIn 0.3s ease;
+.completion-message.show {
+display: flex;
+animation: fadeIn 0.3s;
 }
 
 .completion-message .icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+font-size: 64px;
+color: #B8860B;
+margin-bottom: 20px;
 }
 
 .completion-message h2 {
-  color: #1E7E34;
-  margin-bottom: 6px;
-  font-size: 1.2rem;
-  font-weight: 500;
+margin-bottom: 8px;
 }
 
 .completion-message p {
-  color: #6b6b6b;
-  font-size: 0.9rem;
+color: #6b6b6b;
 }
 
-@keyframes popIn {
-  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
 }
-```
+</style>
 
-  </style>
 </head>
 <body>
-  <header>
-    <h1>新津店ルーティン業務</h1>
-    <div class="version">ver 2026.01.25</div>
-    <div class="date-display" id="dateDisplay"></div>
-  </header>
 
-  <div class="container">
-    <!-- シフト選択画面 -->
-    <div class="shift-select-screen" id="shiftSelectScreen">
-      <h2>シフトを選択してください</h2>
-      <div class="shift-buttons">
-        <button class="shift-btn" onclick="selectShift('超早')">
-          <div>
-            <div>超早</div>
-            <div class="shift-time">7:00 - 16:00</div>
-          </div>
-          <span class="arrow">→</span>
-        </button>
-        <button class="shift-btn" onclick="selectShift('早番')">
-          <div>
-            <div>早番</div>
-            <div class="shift-time">9:00 - 18:00</div>
-          </div>
-          <span class="arrow">→</span>
-        </button>
-        <button class="shift-btn" onclick="selectShift('中番')">
-          <div>
-            <div>中番</div>
-            <div class="shift-time">11:00 - 20:00</div>
-          </div>
-          <span class="arrow">→</span>
-        </button>
-        <button class="shift-btn" onclick="selectShift('遅番')">
-          <div>
-            <div>遅番</div>
-            <div class="shift-time">14:30 - 23:30</div>
-          </div>
-          <span class="arrow">→</span>
-        </button>
-      </div>
+<header>
+  <h1>新津店ルーティン業務</h1>
+  <div class="version">ver 2026.01.26.2</div>
+  <div class="date-display" id="dateDisplay"></div>
+</header>
+
+<div class="container">
+  <!-- シフト選択画面 -->
+  <div id="shiftSelectScreen" class="shift-select-screen">
+    <h2 style="text-align:center; margin-bottom:24px; font-size:1.1rem;">シフトを選択してください</h2>
+    <div class="shift-buttons">
+      <button class="shift-btn" data-shift="超早"><span>超早</span><span class="time">7:00 - 16:00</span></button>
+      <button class="shift-btn" data-shift="早番"><span>早番</span><span class="time">9:00 - 18:00</span></button>
+      <button class="shift-btn" data-shift="中番"><span>中番</span><span class="time">11:00 - 20:00</span></button>
+      <button class="shift-btn" data-shift="遅番"><span>遅番</span><span class="time">14:30 - 23:30</span></button>
+    </div>
+  </div>
+
+  <!-- メイン画面 -->
+
+  <div id="mainScreen" class="main-screen">
+    <div class="nav-tabs">
+      <button class="tab active" data-tab="check">チェック</button>
+      <button class="tab" data-tab="edit">項目編集</button>
+      <button class="tab" data-tab="history">履歴</button>
     </div>
 
 ```
-<!-- メイン画面 -->
-<div class="main-screen" id="mainScreen">
-  <div class="current-shift">
-    <div class="current-shift-info">
-      <div>
-        <div class="current-shift-label">現在のシフト</div>
-        <div class="current-shift-name" id="currentShiftName">-</div>
-      </div>
-    </div>
-    <button class="change-shift-btn" onclick="changeShift()">変更</button>
+<!-- チェックパネル -->
+<div id="checkPanel" class="panel active">
+  <div class="shift-header">
+    <span class="current-shift" id="currentShiftName"></span>
+    <button class="change-btn" id="changeShiftBtn">変更</button>
   </div>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="check">チェック</button>
-    <button class="tab" data-tab="edit">項目編集</button>
-    <button class="tab" data-tab="history">履歴</button>
+  <div id="alreadyCompleted" class="already-completed" style="display:none;">
+    ✓ 本日の業務は完了しています<br>
+    <span style="font-size:0.85rem; color:#666;">明日になるとリセットされます</span>
+    <br>
+    <button class="undo-btn" id="undoCompleteBtn">修正する</button>
   </div>
-
-  <!-- チェック -->
-  <div class="panel active" id="checkPanel">
-    <div id="alreadyCompleted" class="already-completed" style="display: none;">
-      ✓ 本日のチェックは完了しました！<br>
-      <span style="font-size: 0.85rem; color: #8B7355;">明日になるとリセットされます</span>
-      <br><br>
-      <button class="undo-btn" onclick="undoComplete()">もとに戻す</button>
-    </div>
-
-    <div class="progress-section">
-      <div class="progress-header">
-        <span class="progress-label">進捗</span>
-        <span class="progress-count" id="progressText">0/0</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-      </div>
-    </div>
-
-    <div class="checklist" id="checklist"></div>
-
-    <button class="complete-btn" id="completeBtn" disabled>完了</button>
+  <div class="progress-section" id="progressSection">
+    <div class="progress-bar"><div id="progressFill" class="progress-fill" style="width:0%"></div></div>
+    <div id="progressText" class="progress-text">0/0</div>
   </div>
+  <div id="checklist" class="checklist"></div>
+  <button id="completeBtn" class="complete-btn" disabled>完了</button>
+</div>
 
-  <!-- 項目編集 -->
-  <div class="panel" id="editPanel">
-    <div class="edit-section">
-      <h3>シフト選択</h3>
-      <div class="shift-tab-select" id="editShiftTabs"></div>
+<!-- 編集パネル -->
+<div id="editPanel" class="panel">
+  <div id="editShiftTabs" class="edit-shift-tabs"></div>
+  <div class="add-item-section">
+    <input type="text" id="newItemText" placeholder="新しい項目を入力...">
+    <div class="day-select" id="newItemDays">
+      <label><input type="checkbox" value="毎日" checked><span>毎日</span></label>
+      <label><input type="checkbox" value="月"><span>月</span></label>
+      <label><input type="checkbox" value="火"><span>火</span></label>
+      <label><input type="checkbox" value="水"><span>水</span></label>
+      <label><input type="checkbox" value="木"><span>木</span></label>
+      <label><input type="checkbox" value="金"><span>金</span></label>
+      <label><input type="checkbox" value="土"><span>土</span></label>
+      <label><input type="checkbox" value="日"><span>日</span></label>
+    </div>
+    <div class="date-input-row">
+      <span>特定日（毎月）:</span>
+      <input type="number" id="newItemDate" min="1" max="31" placeholder="-">
+      <span>日</span>
+    </div>
+    <button class="add-btn" id="addItemBtn">追加</button>
+  </div>
+  <h3 style="margin-bottom:12px; font-size:1rem;">項目一覧</h3>
+  <ul id="editList" class="edit-list"></ul>
+</div>
 
-      <h3>新しい項目を追加</h3>
-      <div class="add-item-form">
-        <input type="text" id="newItemInput" placeholder="チェック項目を入力">
-        <button onclick="addItem()">追加</button>
-      </div>
-
-      <div class="day-select" id="newItemDays">
-        <label><input type="checkbox" value="毎日" checked><span>毎日</span></label>
-        <label><input type="checkbox" value="月"><span>月</span></label>
-        <label><input type="checkbox" value="火"><span>火</span></label>
-        <label><input type="checkbox" value="水"><span>水</span></label>
-        <label><input type="checkbox" value="木"><span>木</span></label>
-        <label><input type="checkbox" value="金"><span>金</span></label>
-        <label><input type="checkbox" value="土"><span>土</span></label>
-        <label><input type="checkbox" value="日"><span>日</span></label>
-      </div>
-
-      <div class="date-input-row">
-        <label>特定日（毎月）:</label>
-        <input type="number" id="newItemDate" min="1" max="31" placeholder="-">
-        <span style="color: #6b6b6b; font-size: 0.85rem;">日</span>
-      </div>
-
-      <h3>項目一覧</h3>
-      <ul class="edit-list" id="editList"></ul>
+<!-- 履歴パネル -->
+<div id="historyPanel" class="panel">
+  <div id="historyList"></div>
+  <div class="backup-section">
+    <h4>バックアップ・復元</h4>
+    <div class="backup-buttons">
+      <button class="backup-btn" id="exportBackupBtn" onclick="window.exportBackup()">📤 バックアップをコピー</button>
+      <button class="restore-btn" id="showRestoreBtn" onclick="window.showRestoreModal()">📥 バックアップから復元</button>
     </div>
   </div>
-
-  <!-- 履歴 -->
-  <div class="panel" id="historyPanel">
-    <div id="historyList"></div>
-    <button class="reset-btn" onclick="resetHistory()">履歴をクリア</button>
-  </div>
+  <button class="reset-btn" id="resetHistoryBtn" onclick="window.resetHistory()">履歴をクリア</button>
 </div>
 ```
 
   </div>
+</div>
 
-  <!-- 編集モーダル -->
+<!-- 編集モーダル -->
 
-  <div class="modal-overlay" id="editModal">
-    <div class="modal">
-      <h3>項目を編集</h3>
-      <input type="text" id="editItemInput">
-      <div class="day-select" id="editItemDays"></div>
-      <div class="date-input-row">
-        <label>特定日:</label>
-        <input type="number" id="editItemDate" min="1" max="31" placeholder="-">
-        <span style="color: #6b6b6b; font-size: 0.85rem;">日</span>
-      </div>
-      <div class="modal-buttons">
-        <button class="modal-cancel" onclick="closeEditModal()">キャンセル</button>
-        <button class="modal-confirm" onclick="confirmEdit()">保存</button>
-      </div>
+<div id="editModal" class="modal-overlay">
+  <div class="modal">
+    <h3>項目を編集</h3>
+    <input type="text" id="editItemInput">
+    <div class="day-select" id="editItemDays"></div>
+    <div class="date-input-row">
+      <span>特定日:</span>
+      <input type="number" id="editItemDate" min="1" max="31" placeholder="-">
+      <span>日</span>
+    </div>
+    <div class="modal-buttons">
+      <button class="modal-cancel" id="editModalCancel">キャンセル</button>
+      <button class="modal-confirm" id="editModalConfirm">保存</button>
     </div>
   </div>
+</div>
 
-  <!-- 完了メッセージ -->
+<!-- 完了メッセージ -->
 
-  <div class="completion-message" id="completionMessage">
-    <div class="icon">✓</div>
-    <h2>完了しました</h2>
-    <p>お疲れ様でした</p>
-  </div>
+<div id="completionMessage" class="completion-message">
+  <div class="icon">✓</div>
+  <h2>完了しました</h2>
+  <p>お疲れ様でした</p>
+</div>
 
-  <script>
-    // ========== データ構造 ==========
-    const STORAGE_KEYS = {
-      items: 'manager_check_items_v2',
-      todayChecks: 'manager_today_checks_v2',
-      history: 'manager_history_v2',
-      lastDate: 'manager_last_date_v2',
-      currentShift: 'manager_current_shift'
-    };
+<script>
+/**
+ * ========================================
+ * 新津店ルーティン業務チェックリストアプリ
+ * ver 2026.01.26.2
+ * ========================================
+ * 
+ * 【データ構造】
+ * - items: { シフト名: [{ id, text, days, date }, ...], ... }
+ * - todayChecks: { "YYYY-M-D_シフト名_itemId": true/false, ... }
+ * - history: [{ dateKey, date, shift, time, checkedItems: {id: {text, checked}}, allChecked }, ...]
+ * - currentShift: "シフト名" | null
+ * 
+ * 【改善点】
+ * 1. 履歴はIDベースで保存（項目の並び替え・削除に強い）
+ * 2. 日付判定ロジックを関数化・堅牢化
+ * 3. localStorage周りを安全に処理
+ * 4. チェックボックスの二重イベント防止
+ */
 
-    const SHIFTS = ['超早', '早番', '中番', '遅番'];
-    const DAYS = ['日', '月', '火', '水', '木', '金', '土'];
+(function() {
+  'use strict';
 
-    const DEFAULT_ITEMS = {
-      '超早': [
-        { text: 'ポスト確認（社員①）', days: ['毎日'], date: null },
-        { text: '青果導入リスト（社員①）', days: ['毎日'], date: null },
-        { text: '7:00朝礼（社員①）', days: ['毎日'], date: null },
-        { text: '取り寄せ発注（社員①）', days: ['毎日'], date: null },
-      ],
-      '早番': [
-        { text: 'レジ金確認', days: ['毎日'], date: null },
-        { text: '売場巡回・整理整頓', days: ['毎日'], date: null },
-        { text: 'POP・値札確認', days: ['毎日'], date: null },
-        { text: '冷蔵庫温度記録', days: ['毎日'], date: null },
-        { text: '発注業務', days: ['月', '水', '金'], date: null },
-        { text: '棚卸し', days: [], date: 25 },
-      ],
-      '中番': [
-        { text: 'レジ応援・混雑対応', days: ['毎日'], date: null },
-        { text: '売場補充', days: ['毎日'], date: null },
-        { text: '在庫整理', days: ['毎日'], date: null },
-        { text: '引き継ぎ確認', days: ['毎日'], date: null },
-      ],
-      '遅番': [
-        { text: 'レジ締め作業', days: ['毎日'], date: null },
-        { text: '売上報告', days: ['毎日'], date: null },
-        { text: '閉店作業（施錠確認）', days: ['毎日'], date: null },
-        { text: '翌日準備確認', days: ['毎日'], date: null },
-        { text: '清掃チェック', days: ['毎日'], date: null },
-        { text: '週報作成', days: ['金'], date: null },
-      ]
-    };
+  // ========================================
+  // 定数定義
+  // ========================================
+  
+  /** ストレージキー */
+  var STORAGE_KEYS = {
+    items: 'niitsu_routine_items_v4',
+    todayChecks: 'niitsu_routine_checks_v4',
+    history: 'niitsu_routine_hist_v4',
+    currentShift: 'niitsu_routine_shift_v4',
+    lastDate: 'niitsu_routine_date_v4'
+  };
 
-    // ========== 状態 ==========
-    let items = {};
-    let todayChecks = {};
-    let history = [];
-    let currentShift = null;
-    let editingShift = '超早';
-    let editingIndex = -1;
+  /** シフト一覧 */
+  var SHIFTS = ['超早', '早番', '中番', '遅番'];
 
-    // ========== ユーティリティ ==========
-    function loadData(key, defaultValue) {
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : defaultValue;
+  /** 曜日名（Date.getDay()の戻り値に対応） */
+  var DAY_NAMES = ['日', '月', '火', '水', '木', '金', '土'];
+
+  /** バックアップバージョン */
+  var BACKUP_VERSION = '2026.01.26.2';
+
+  // ========================================
+  // アプリケーション状態
+  // ========================================
+  
+  var state = {
+    items: {},           // チェック項目データ
+    todayChecks: {},     // 今日のチェック状態
+    history: [],         // 完了履歴
+    currentShift: null,  // 現在選択中のシフト
+    editingShift: null,  // 編集画面で選択中のシフト
+    editingIndex: -1     // 編集中の項目インデックス
+  };
+
+  // ========================================
+  // ユーティリティ関数
+  // ========================================
+
+  /**
+   * ユニークIDを生成
+   * @returns {string} ランダムなID文字列
+   */
+  function generateId() {
+    return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  /**
+   * 今日の日付キーを取得（YYYY-M-D形式）
+   * @returns {string}
+   */
+  function getTodayKey() {
+    var d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+  }
+
+  /**
+   * 今日の日付を日本語文字列で取得
+   * @returns {string}
+   */
+  function getTodayString() {
+    return new Date().toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long'
+    });
+  }
+
+  /**
+   * 今日の曜日名を取得
+   * @returns {string} '日'〜'土'
+   */
+  function getTodayDayName() {
+    return DAY_NAMES[new Date().getDay()];
+  }
+
+  /**
+   * 今日の日付（日）を取得
+   * @returns {number} 1〜31
+   */
+  function getTodayDate() {
+    return new Date().getDate();
+  }
+
+  // ========================================
+  // localStorage 安全操作
+  // ========================================
+
+  /**
+   * localStorageから安全に読み込み
+   * @param {string} key ストレージキー
+   * @param {*} defaultValue デフォルト値
+   * @returns {*} パースされた値またはデフォルト値
+   */
+  function loadFromStorage(key, defaultValue) {
+    try {
+      var data = localStorage.getItem(key);
+      if (data === null || data === undefined) {
+        return defaultValue;
+      }
+      var parsed = JSON.parse(data);
+      // nullやundefinedがパースされた場合もデフォルト値を返す
+      return (parsed !== null && parsed !== undefined) ? parsed : defaultValue;
+    } catch (e) {
+      console.warn('localStorage読み込みエラー:', key, e);
+      return defaultValue;
     }
+  }
 
-    function saveData(key, value) {
+  /**
+   * localStorageへ安全に保存
+   * @param {string} key ストレージキー
+   * @param {*} value 保存する値
+   * @returns {boolean} 成功したかどうか
+   */
+  function saveToStorage(key, value) {
+    try {
       localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function getTodayString() {
-      const today = new Date();
-      return today.toLocaleDateString('ja-JP', { 
-        year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
-      });
-    }
-
-    function getTodayKey() {
-      const today = new Date();
-      return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-    }
-
-    function getTodayDayName() {
-      return DAYS[new Date().getDay()];
-    }
-
-    function getTodayDate() {
-      return new Date().getDate();
-    }
-
-    function shouldShowItem(item) {
-      const todayDay = getTodayDayName();
-      const todayDate = getTodayDate();
-
-      if (item.date && item.date === todayDate) return true;
-      if (item.days.includes('毎日')) return true;
-      if (item.days.includes(todayDay)) return true;
-      if (item.days.length === 0 && !item.date) return true;
-
+      return true;
+    } catch (e) {
+      console.error('localStorage保存エラー:', key, e);
+      // 容量オーバーの場合などはアラート
+      if (e.name === 'QuotaExceededError') {
+        alert('ストレージ容量が不足しています。履歴をクリアしてください。');
+      }
       return false;
     }
+  }
 
-    function checkDateChange() {
-      const lastDate = localStorage.getItem(STORAGE_KEYS.lastDate);
-      const todayKey = getTodayKey();
-      
-      if (lastDate !== todayKey) {
-        saveData(STORAGE_KEYS.todayChecks, {});
-        localStorage.setItem(STORAGE_KEYS.lastDate, todayKey);
+  // ========================================
+  // 日付・曜日判定ロジック
+  // ========================================
+
+  /**
+   * 項目が今日表示されるべきかを判定
+   * 
+   * 【優先順位】
+   * 1. 特定日（date）が設定されている → その日のみ表示
+   * 2. 曜日（days）に「毎日」が含まれる → 毎日表示
+   * 3. 曜日（days）に今日の曜日が含まれる → その曜日のみ表示
+   * 4. 何も設定されていない → 毎日表示（後方互換性）
+   * 
+   * @param {Object} item チェック項目
+   * @param {number|null} item.date 特定日（1〜31）
+   * @param {string[]} item.days 曜日配列（'毎日', '月'〜'日'）
+   * @returns {boolean}
+   */
+  function shouldShowItem(item) {
+    var todayDate = getTodayDate();
+    var todayDayName = getTodayDayName();
+
+    // 1. 特定日が設定されている場合
+    if (item.date !== null && item.date !== undefined && item.date !== '') {
+      var targetDate = parseInt(item.date, 10);
+      // 無効な日付（NaN、0以下、32以上）は表示しない
+      if (isNaN(targetDate) || targetDate < 1 || targetDate > 31) {
+        return false;
       }
+      // 月末処理：例えば31日設定で今月が30日までの場合、
+      // 今日が月末なら表示する（オプション機能として将来実装可能）
+      // 現状はシンプルに完全一致のみ
+      return targetDate === todayDate;
     }
 
-    // ========== シフト選択 ==========
-    function selectShift(shift) {
-      currentShift = shift;
-      saveData(STORAGE_KEYS.currentShift, shift);
-      document.getElementById('currentShiftName').textContent = shift;
-      document.getElementById('shiftSelectScreen').style.display = 'none';
-      document.getElementById('mainScreen').classList.add('active');
-      
-      renderChecklist();
-      updateProgress();
-      checkAlreadyCompleted();
+    // 2. 曜日設定の確認
+    var days = item.days;
+    
+    // 曜日が未設定または空配列の場合は毎日表示（後方互換性）
+    if (!days || !Array.isArray(days) || days.length === 0) {
+      return true;
     }
 
-    function changeShift() {
-      document.getElementById('shiftSelectScreen').style.display = 'block';
-      document.getElementById('mainScreen').classList.remove('active');
+    // 「毎日」が含まれていれば表示
+    if (days.indexOf('毎日') !== -1) {
+      return true;
     }
 
-    // ========== 初期化 ==========
-    function init() {
-      checkDateChange();
-      
-      items = loadData(STORAGE_KEYS.items, DEFAULT_ITEMS);
-      
-      // すべてのシフトの項目を強制的に新しい内容に上書き
-      items['超早'] = [
-        { text: '社員①７:00朝礼', days: ['毎日'], date: null },
-        { text: '社員①売変（前日夜だが当日出力された場合は実施）', days: ['毎日'], date: null },
-        { text: '社員①取り寄せ発注', days: ['毎日'], date: null },
-        { text: '社員①ポスト確認', days: ['毎日'], date: null },
-        { text: '社員①欠品リスト印刷', days: ['毎日'], date: null },
-        { text: '社員①青果導入リスト印刷', days: ['毎日'], date: null },
-        { text: '社員②8:30朝礼', days: ['毎日'], date: null },
-        { text: '社員②本部便処理', days: ['毎日'], date: null },
-        { text: '社員②販促POP貼（のぼり）', days: ['毎日'], date: null },
-        { text: '社員②水抜き（6/1-9/30）', days: ['毎日'], date: null },
-        { text: '社員②取り寄せ確認（飲料も）', days: ['毎日'], date: null },
-        { text: '社員②１便を８時までに中に入れる', days: ['毎日'], date: null },
-      ];
-      items['早番'] = [
-        { text: '社員③仕分け（飲料品出しのあと）', days: ['毎日'], date: null },
-        { text: '社員③知久屋売上', days: ['毎日'], date: null },
-        { text: '社員③トナー、ラミ確認（日曜日のみ）', days: ['日'], date: null },
-      ];
-      items['中番'] = [];
-      items['遅番'] = [
-        { text: '響きやFAX（月曜のみ）', days: ['月'], date: null },
-        { text: 'HACCAPチェック', days: ['毎日'], date: null },
-        { text: 'お客様の声回収', days: ['毎日'], date: null },
-        { text: '夜売変（値下は閉店後POP設置）', days: ['毎日'], date: null },
-        { text: '【金券】金券、レジマイレシート回収', days: ['毎日'], date: null },
-        { text: '【金券】取り寄せ券、ポイtのカード関連、ipad回収', days: ['毎日'], date: null },
-        { text: '【金券】レジ日報、違算金記入', days: ['毎日'], date: null },
-        { text: '【金券】残業メール作成', days: ['毎日'], date: null },
-        { text: '【現金】レジ両替', days: ['毎日'], date: null },
-        { text: '【現金】金庫内点検', days: ['毎日'], date: null },
-        { text: '【現金】売上金回収', days: ['毎日'], date: null },
-        { text: '【現金】アルソック両替（日、木）', days: ['日', '木'], date: null },
-        { text: '【確認】HACCAP、販売管理記録記入', days: ['毎日'], date: null },
-        { text: '【確認】販促POPとり', days: ['毎日'], date: null },
-        { text: '【確認】青果水抜き（夏）', days: ['毎日'], date: null },
-        { text: '【確認】能動入力', days: ['毎日'], date: null },
-        { text: '【確認】海商報告', days: ['毎日'], date: null },
-        { text: '【確認】青果室でHACCAPサイン', days: ['毎日'], date: null },
-      ];
-      saveData(STORAGE_KEYS.items, items);
-      
-      todayChecks = loadData(STORAGE_KEYS.todayChecks, {});
-      history = loadData(STORAGE_KEYS.history, []);
-      currentShift = loadData(STORAGE_KEYS.currentShift, null);
+    // 今日の曜日が含まれていれば表示
+    if (days.indexOf(todayDayName) !== -1) {
+      return true;
+    }
 
-      document.getElementById('dateDisplay').textContent = getTodayString();
+    return false;
+  }
 
-      if (currentShift) {
-        document.getElementById('currentShiftName').textContent = currentShift;
-        document.getElementById('shiftSelectScreen').style.display = 'none';
-        document.getElementById('mainScreen').classList.add('active');
+  /**
+   * 項目の表示用ラベルを取得
+   * @param {Object} item
+   * @returns {string} 表示ラベル（空文字の場合もあり）
+   */
+  function getItemDayLabel(item) {
+    if (item.date) {
+      return item.date + '日';
+    }
+    if (item.days && item.days.length > 0 && item.days.indexOf('毎日') === -1) {
+      return item.days.join('・');
+    }
+    return '';
+  }
+
+  // ========================================
+  // デフォルトデータ
+  // ========================================
+
+  /**
+   * 初期データを生成
+   * @returns {Object}
+   */
+  function createDefaultItems() {
+    return {
+      '超早': [
+        { id: generateId(), text: '社員①７:00朝礼', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員①売変（前日夜だが当日出力された場合は実施）', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員①取り寄せ発注', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員①ポスト確認', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員①欠品リスト印刷', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員①青果導入リスト印刷', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員②8:30朝礼', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員②本部便処理', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員②販促POP貼（のぼり）', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員②水抜き（6/1-9/30）', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員②取り寄せ確認（飲料も）', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員②１便を８時までに中に入れる', days: ['毎日'], date: null }
+      ],
+      '早番': [
+        { id: generateId(), text: '社員③仕分け（飲料品出しのあと）', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員③知久屋売上', days: ['毎日'], date: null },
+        { id: generateId(), text: '社員③トナー、ラミ確認（日曜日のみ）', days: ['日'], date: null }
+      ],
+      '中番': [],
+      '遅番': [
+        { id: generateId(), text: '響きやFAX（月曜のみ）', days: ['月'], date: null },
+        { id: generateId(), text: 'HACCAPチェック', days: ['毎日'], date: null },
+        { id: generateId(), text: 'お客様の声回収', days: ['毎日'], date: null },
+        { id: generateId(), text: '夜売変（値下は閉店後POP設置）', days: ['毎日'], date: null },
+        { id: generateId(), text: '【金券】金券、レジマイレシート回収', days: ['毎日'], date: null },
+        { id: generateId(), text: '【金券】取り寄せ券、ポイントのカード関連、ipad回収', days: ['毎日'], date: null },
+        { id: generateId(), text: '【金券】レジ日報、違算金記入', days: ['毎日'], date: null },
+        { id: generateId(), text: '【金券】残業メール作成', days: ['毎日'], date: null },
+        { id: generateId(), text: '【現金】レジ両替', days: ['毎日'], date: null },
+        { id: generateId(), text: '【現金】金庫内点検', days: ['毎日'], date: null },
+        { id: generateId(), text: '【現金】売上金回収', days: ['毎日'], date: null },
+        { id: generateId(), text: '【現金】アルソック両替（日、木）', days: ['日', '木'], date: null },
+        { id: generateId(), text: '【確認】HACCAP、販売管理記録記入', days: ['毎日'], date: null },
+        { id: generateId(), text: '【確認】販促POPとり', days: ['毎日'], date: null },
+        { id: generateId(), text: '【確認】青果水抜き（夏）', days: ['毎日'], date: null },
+        { id: generateId(), text: '【確認】能動入力', days: ['毎日'], date: null },
+        { id: generateId(), text: '【確認】海商報告', days: ['毎日'], date: null },
+        { id: generateId(), text: '【確認】青果室でHACCAPサイン', days: ['毎日'], date: null }
+      ]
+    };
+  }
+
+  // ========================================
+  // データマイグレーション
+  // ========================================
+
+  /**
+   * 古い形式のデータを新形式にマイグレーション
+   * @param {Object} items
+   * @returns {Object}
+   */
+  function migrateItems(items) {
+    if (!items || typeof items !== 'object') {
+      return createDefaultItems();
+    }
+
+    var migrated = {};
+    for (var shift in items) {
+      if (!Array.isArray(items[shift])) {
+        migrated[shift] = [];
+        continue;
       }
-
-      renderEditShiftTabs();
-      renderChecklist();
-      renderEditList();
-      renderHistory();
-      updateProgress();
-      checkAlreadyCompleted();
-
-      // タブ
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+      migrated[shift] = items[shift].map(function(item) {
+        // IDがない場合は生成
+        if (!item.id) {
+          item.id = generateId();
+        }
+        // daysがない場合は空配列
+        if (!item.days) {
+          item.days = ['毎日'];
+        }
+        // dateがundefinedの場合はnull
+        if (item.date === undefined) {
+          item.date = null;
+        }
+        return item;
       });
-
-      document.getElementById('completeBtn').addEventListener('click', completeCheck);
-
-      // 曜日選択の排他制御
-      setupDaySelectLogic('newItemDays');
     }
 
-    function setupDaySelectLogic(containerId) {
-      const container = document.getElementById(containerId);
-      const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-      
-      checkboxes.forEach(cb => {
-        cb.addEventListener('change', () => {
-          if (cb.value === '毎日' && cb.checked) {
-            checkboxes.forEach(other => {
-              if (other.value !== '毎日') other.checked = false;
-            });
-          } else if (cb.value !== '毎日' && cb.checked) {
-            const everyday = container.querySelector('input[value="毎日"]');
-            if (everyday) everyday.checked = false;
-          }
+    // 存在しないシフトは空配列で初期化
+    SHIFTS.forEach(function(shift) {
+      if (!migrated[shift]) {
+        migrated[shift] = [];
+      }
+    });
+
+    return migrated;
+  }
+
+  /**
+   * 古い履歴形式（indexベース）を新形式（IDベース）にマイグレーション
+   * ※完全な変換は不可能なため、古い履歴は表示のみ対応
+   * @param {Array} history
+   * @returns {Array}
+   */
+  function migrateHistory(history) {
+    if (!Array.isArray(history)) {
+      return [];
+    }
+    return history.map(function(record) {
+      // すでに新形式（checkedItems）の場合はそのまま
+      if (record.checkedItems) {
+        return record;
+      }
+      // 旧形式（items配列 + checks オブジェクト）の場合
+      // 完全な変換は不可能だが、表示用に変換
+      if (record.items && record.checks) {
+        var checkedItems = {};
+        record.items.forEach(function(text, index) {
+          // 仮のIDを生成（表示用）
+          var tempId = 'legacy_' + index;
+          checkedItems[tempId] = {
+            text: text,
+            checked: !!record.checks[index]
+          };
         });
-      });
-    }
-
-    // ========== タブ ==========
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      
-      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-      document.getElementById(`${tabName}Panel`).classList.add('active');
-
-      if (tabName === 'edit') {
-        renderEditList();
+        return {
+          dateKey: record.dateKey,
+          date: record.date,
+          shift: record.shift,
+          time: record.time,
+          checkedItems: checkedItems,
+          allChecked: record.allChecked
+        };
       }
+      return record;
+    });
+  }
+
+  // ========================================
+  // チェック状態管理
+  // ========================================
+
+  /**
+   * チェック状態のキーを生成
+   * @param {string} shift シフト名
+   * @param {string} itemId 項目ID
+   * @returns {string}
+   */
+  function getCheckKey(shift, itemId) {
+    return getTodayKey() + '_' + shift + '_' + itemId;
+  }
+
+  /**
+   * 項目のチェック状態を取得
+   * @param {string} itemId
+   * @returns {boolean}
+   */
+  function isItemChecked(itemId) {
+    var key = getCheckKey(state.currentShift, itemId);
+    return !!state.todayChecks[key];
+  }
+
+  /**
+   * 項目のチェック状態をトグル
+   * @param {string} itemId
+   */
+  function toggleItemCheck(itemId) {
+    var key = getCheckKey(state.currentShift, itemId);
+    state.todayChecks[key] = !state.todayChecks[key];
+    saveToStorage(STORAGE_KEYS.todayChecks, state.todayChecks);
+    renderChecklist();
+    updateProgress();
+  }
+
+  /**
+   * 現在のシフトの表示項目を取得
+   * @returns {Array}
+   */
+  function getVisibleItems() {
+    if (!state.currentShift || !state.items[state.currentShift]) {
+      return [];
+    }
+    return state.items[state.currentShift].filter(shouldShowItem);
+  }
+
+  /**
+   * 完了可能かどうかを判定
+   * @returns {boolean}
+   */
+  function canComplete() {
+    var visible = getVisibleItems();
+    if (visible.length === 0) {
+      return false;
+    }
+    return visible.every(function(item) {
+      return isItemChecked(item.id);
+    });
+  }
+
+  // ========================================
+  // 日付変更検知
+  // ========================================
+
+  /**
+   * 日付が変わったかチェックし、必要ならリセット
+   * @returns {boolean} 日付が変わった場合true
+   */
+  function checkDateChange() {
+    var lastDate = localStorage.getItem(STORAGE_KEYS.lastDate);
+    var today = getTodayKey();
+
+    if (lastDate !== today) {
+      localStorage.setItem(STORAGE_KEYS.lastDate, today);
+      state.todayChecks = {};
+      saveToStorage(STORAGE_KEYS.todayChecks, state.todayChecks);
+      return true;
+    }
+    return false;
+  }
+
+  // ========================================
+  // 完了処理
+  // ========================================
+
+  /**
+   * 本日すでに完了しているかチェック
+   * @returns {boolean}
+   */
+  function isAlreadyCompleted() {
+    var todayKey = getTodayKey();
+    return state.history.some(function(record) {
+      return record.dateKey === todayKey &&
+             record.shift === state.currentShift &&
+             record.allChecked === true;
+    });
+  }
+
+  /**
+   * 完了処理を実行
+   */
+  function completeCheck() {
+    if (!canComplete()) {
+      return;
     }
 
-    // ========== 編集シフトタブ ==========
-    function renderEditShiftTabs() {
-      const container = document.getElementById('editShiftTabs');
-      container.innerHTML = SHIFTS.map(shift => `
-        <button class="shift-tab ${shift === editingShift ? 'active' : ''}" 
-                onclick="switchEditShift('${shift}')">${shift}</button>
-      `).join('');
-    }
+    var todayKey = getTodayKey();
+    var now = new Date();
+    var visible = getVisibleItems();
 
-    function switchEditShift(shift) {
-      editingShift = shift;
-      renderEditShiftTabs();
-      renderEditList();
-    }
-
-    // ========== チェックリスト ==========
-    function renderChecklist() {
-      const container = document.getElementById('checklist');
-      if (!currentShift || !items[currentShift]) {
-        container.innerHTML = '<p style="color:#9b9b9b;text-align:center;padding:20px;">シフトを選択してください</p>';
-        return;
-      }
-
-      const shiftItems = items[currentShift];
-      const visibleItems = shiftItems.filter(shouldShowItem);
-      
-      container.innerHTML = '';
-
-      visibleItems.forEach((item, idx) => {
-        const originalIndex = shiftItems.indexOf(item);
-        const checkKey = `${currentShift}-${originalIndex}`;
-        const isChecked = todayChecks[checkKey] === true;
-
-        const dayLabel = item.date ? `${item.date}日` : 
-                        (item.days.includes('毎日') ? '' : item.days.join('・'));
-
-        const div = document.createElement('div');
-        div.className = `checklist-item ${isChecked ? 'checked' : ''}`;
-        div.innerHTML = `
-          <div class="custom-checkbox">
-            <input type="checkbox" id="check${originalIndex}" ${isChecked ? 'checked' : ''}>
-            <span class="checkmark"></span>
-          </div>
-          <label for="check${originalIndex}">${item.text}</label>
-          ${dayLabel ? `<span class="day-badge">${dayLabel}</span>` : ''}
-        `;
-
-        const checkbox = div.querySelector('input');
-        checkbox.addEventListener('change', () => toggleCheck(originalIndex));
-
-        container.appendChild(div);
-      });
-
-      if (visibleItems.length === 0) {
-        container.innerHTML = '<p style="color:#9b9b9b;text-align:center;padding:20px;">本日のチェック項目はありません</p>';
-      }
-    }
-
-    function toggleCheck(index) {
-      const checkKey = `${currentShift}-${index}`;
-      todayChecks[checkKey] = !todayChecks[checkKey];
-      saveData(STORAGE_KEYS.todayChecks, todayChecks);
-      renderChecklist();
-      updateProgress();
-    }
-
-    function updateProgress() {
-      if (!currentShift || !items[currentShift]) return;
-
-      const shiftItems = items[currentShift];
-      const visibleItems = shiftItems.filter(shouldShowItem);
-      const total = visibleItems.length;
-      
-      let checked = 0;
-      visibleItems.forEach(item => {
-        const originalIndex = shiftItems.indexOf(item);
-        const checkKey = `${currentShift}-${originalIndex}`;
-        if (todayChecks[checkKey]) checked++;
-      });
-
-      const percent = total > 0 ? (checked / total) * 100 : 0;
-
-      document.getElementById('progressFill').style.width = `${percent}%`;
-      document.getElementById('progressText').textContent = `${checked}/${total}`;
-
-      document.getElementById('completeBtn').disabled = checked < total || total === 0;
-    }
-
-    function checkAlreadyCompleted() {
-      const todayKey = getTodayKey();
-      const todayHistory = history.find(h => 
-        h.dateKey === todayKey && h.shift === currentShift && h.allChecked
-      );
-      
-      const alreadyMsg = document.getElementById('alreadyCompleted');
-      const checklist = document.getElementById('checklist');
-      const progressSection = document.querySelector('.progress-section');
-      const completeBtn = document.getElementById('completeBtn');
-      
-      if (todayHistory) {
-        alreadyMsg.style.display = 'block';
-        checklist.style.display = 'none';
-        progressSection.style.display = 'none';
-        completeBtn.style.display = 'none';
-      } else {
-        alreadyMsg.style.display = 'none';
-        checklist.style.display = 'flex';
-        progressSection.style.display = 'block';
-        completeBtn.style.display = 'block';
-      }
-    }
-
-    function completeCheck() {
-      const todayKey = getTodayKey();
-      const now = new Date();
-      const shiftItems = items[currentShift];
-      const visibleItems = shiftItems.filter(shouldShowItem);
-
-      const checksForHistory = {};
-      visibleItems.forEach(item => {
-        const idx = shiftItems.indexOf(item);
-        checksForHistory[idx] = todayChecks[`${currentShift}-${idx}`] || false;
-      });
-
-      const record = {
-        dateKey: todayKey,
-        date: getTodayString(),
-        time: now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
-        shift: currentShift,
-        items: visibleItems.map(i => i.text),
-        checks: checksForHistory,
-        allChecked: Object.values(checksForHistory).every(v => v === true)
+    // IDベースでチェック状態を保存
+    var checkedItems = {};
+    visible.forEach(function(item) {
+      checkedItems[item.id] = {
+        text: item.text,
+        checked: isItemChecked(item.id)
       };
+    });
 
-      const existingIndex = history.findIndex(h => 
-        h.dateKey === todayKey && h.shift === currentShift
-      );
-      
-      if (existingIndex >= 0) {
-        history[existingIndex] = record;
-      } else {
-        history.unshift(record);
-      }
+    var record = {
+      dateKey: todayKey,
+      date: getTodayString(),
+      shift: state.currentShift,
+      time: now.getHours() + ':' + ('0' + now.getMinutes()).slice(-2),
+      checkedItems: checkedItems,
+      allChecked: true
+    };
 
-      saveData(STORAGE_KEYS.history, history);
+    state.history.unshift(record);
+    
+    // 履歴は最大100件まで
+    if (state.history.length > 100) {
+      state.history = state.history.slice(0, 100);
+    }
+    
+    saveToStorage(STORAGE_KEYS.history, state.history);
+
+    // 完了アニメーション表示
+    showCompletionMessage();
+  }
+
+  /**
+   * 完了を取り消し
+   */
+  function undoComplete() {
+    var todayKey = getTodayKey();
+    state.history = state.history.filter(function(record) {
+      return !(record.dateKey === todayKey && record.shift === state.currentShift);
+    });
+    saveToStorage(STORAGE_KEYS.history, state.history);
+    
+    renderChecklist();
+    updateProgress();
+    updateCompletedState();
+    renderHistory();
+  }
+
+  /**
+   * 完了メッセージを表示
+   */
+  function showCompletionMessage() {
+    var msg = document.getElementById('completionMessage');
+    msg.classList.add('show');
+    setTimeout(function() {
+      msg.classList.remove('show');
+      updateCompletedState();
       renderHistory();
-      checkAlreadyCompleted();
+    }, 1500);
+  }
 
-      const msg = document.getElementById('completionMessage');
-      msg.classList.add('active');
-      setTimeout(() => msg.classList.remove('active'), 2000);
+  // ========================================
+  // UI レンダリング
+  // ========================================
+
+  /**
+   * チェックリストを描画
+   */
+  function renderChecklist() {
+    var container = document.getElementById('checklist');
+    container.innerHTML = '';
+
+    var visible = getVisibleItems();
+
+    if (visible.length === 0) {
+      container.innerHTML = '<p style="text-align:center; color:#9b9b9b; padding:20px;">本日のチェック項目はありません</p>';
+      return;
     }
 
-    // ========== 項目編集 ==========
-    function renderEditList() {
-      const container = document.getElementById('editList');
-      const shiftItems = items[editingShift] || [];
+    visible.forEach(function(item) {
+      var checked = isItemChecked(item.id);
+      var dayLabel = getItemDayLabel(item);
 
-      container.innerHTML = '';
+      var div = document.createElement('div');
+      div.className = 'checklist-item' + (checked ? ' checked' : '');
+      div.setAttribute('data-id', item.id);
 
-      shiftItems.forEach((item, index) => {
-        const dayLabel = item.date ? `${item.date}日` : 
-                        (item.days.length === 0 ? '条件なし' : item.days.join('・'));
-
-        const li = document.createElement('li');
-        li.className = 'edit-list-item';
-        li.dataset.index = index;
-        li.innerHTML = `
-          <div class="edit-item-top">
-            <span class="item-text">${item.text}</span>
-            <span class="item-days">${dayLabel}</span>
-          </div>
-          <div class="edit-item-bottom">
-            <div class="move-group">
-              <button class="move-btn" onclick="moveItem(${index}, -1)">↑ 上へ</button>
-              <button class="move-btn" onclick="moveItem(${index}, 1)">↓ 下へ</button>
-            </div>
-            <div class="action-group">
-              <button class="edit-btn" onclick="openEditModal(${index})">編集</button>
-              <button class="delete-btn" onclick="deleteItem(${index})">削除</button>
-            </div>
-          </div>
-        `;
-
-        container.appendChild(li);
+      // チェックボックス部分
+      var checkboxDiv = document.createElement('div');
+      checkboxDiv.className = 'custom-checkbox';
+      
+      var input = document.createElement('input');
+      input.type = 'checkbox';
+      input.checked = checked;
+      input.setAttribute('data-id', item.id);
+      // チェックボックス自体のクリックイベントは親要素で処理するため停止
+      input.addEventListener('click', function(e) {
+        e.stopPropagation();
       });
-    }
-
-    function moveItem(index, direction) {
-      const shiftItems = items[editingShift];
-      const newIndex = index + direction;
-      
-      if (newIndex < 0 || newIndex >= shiftItems.length) return;
-
-      const temp = shiftItems[index];
-      shiftItems[index] = shiftItems[newIndex];
-      shiftItems[newIndex] = temp;
-
-      saveData(STORAGE_KEYS.items, items);
-      renderEditList();
-      
-      if (editingShift === currentShift) {
-        renderChecklist();
-      }
-    }
-
-    function addItem() {
-      const input = document.getElementById('newItemInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const dayCheckboxes = document.querySelectorAll('#newItemDays input:checked');
-      const days = Array.from(dayCheckboxes).map(cb => cb.value);
-      
-      const dateInput = document.getElementById('newItemDate');
-      const date = dateInput.value ? parseInt(dateInput.value) : null;
-
-      if (!items[editingShift]) items[editingShift] = [];
-      
-      items[editingShift].push({
-        text: text,
-        days: days,
-        date: date
+      input.addEventListener('change', function(e) {
+        toggleItemCheck(e.target.getAttribute('data-id'));
       });
 
-      saveData(STORAGE_KEYS.items, items);
-      input.value = '';
-      dateInput.value = '';
+      var checkmark = document.createElement('span');
+      checkmark.className = 'checkmark';
 
-      // リセット
-      document.querySelectorAll('#newItemDays input').forEach(cb => {
-        cb.checked = cb.value === '毎日';
+      checkboxDiv.appendChild(input);
+      checkboxDiv.appendChild(checkmark);
+
+      // テキスト部分
+      var textSpan = document.createElement('span');
+      textSpan.className = 'item-text';
+      textSpan.textContent = item.text;
+
+      div.appendChild(checkboxDiv);
+      div.appendChild(textSpan);
+
+      // 曜日バッジ
+      if (dayLabel) {
+        var badge = document.createElement('span');
+        badge.className = 'day-badge';
+        badge.textContent = dayLabel;
+        div.appendChild(badge);
+      }
+
+      // 行全体のクリックでトグル（チェックボックス以外の部分）
+      div.addEventListener('click', function(e) {
+        // チェックボックス部分のクリックは除外
+        if (e.target.tagName === 'INPUT') {
+          return;
+        }
+        var itemId = this.getAttribute('data-id');
+        toggleItemCheck(itemId);
       });
 
-      renderEditList();
-      if (editingShift === currentShift) {
-        renderChecklist();
-        updateProgress();
+      container.appendChild(div);
+    });
+
+    updateCompletedState();
+  }
+
+  /**
+   * プログレスバーを更新
+   */
+  function updateProgress() {
+    var visible = getVisibleItems();
+    var total = visible.length;
+    var checked = visible.filter(function(item) {
+      return isItemChecked(item.id);
+    }).length;
+
+    var percent = total > 0 ? (checked / total) * 100 : 0;
+
+    document.getElementById('progressFill').style.width = percent + '%';
+    document.getElementById('progressText').textContent = checked + '/' + total;
+    document.getElementById('completeBtn').disabled = !canComplete();
+  }
+
+  /**
+   * 完了済み状態の表示を更新
+   */
+  function updateCompletedState() {
+    var completed = isAlreadyCompleted();
+    var alreadyMsg = document.getElementById('alreadyCompleted');
+    var checklist = document.getElementById('checklist');
+    var progressSection = document.getElementById('progressSection');
+    var completeBtn = document.getElementById('completeBtn');
+
+    if (completed) {
+      alreadyMsg.style.display = 'block';
+      checklist.style.display = 'none';
+      progressSection.style.display = 'none';
+      completeBtn.style.display = 'none';
+    } else {
+      alreadyMsg.style.display = 'none';
+      checklist.style.display = 'flex';
+      progressSection.style.display = 'block';
+      completeBtn.style.display = 'block';
+    }
+  }
+
+  /**
+   * 編集画面のシフトタブを描画
+   */
+  function renderEditShiftTabs() {
+    var container = document.getElementById('editShiftTabs');
+    container.innerHTML = '';
+
+    SHIFTS.forEach(function(shift) {
+      var btn = document.createElement('button');
+      btn.className = 'edit-shift-tab' + (shift === state.editingShift ? ' active' : '');
+      btn.textContent = shift;
+      btn.addEventListener('click', function() {
+        state.editingShift = shift;
+        renderEditShiftTabs();
+        renderEditList();
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  /**
+   * 編集リストを描画
+   */
+  function renderEditList() {
+    var container = document.getElementById('editList');
+    container.innerHTML = '';
+
+    if (!state.editingShift || !state.items[state.editingShift]) {
+      return;
+    }
+
+    var shiftItems = state.items[state.editingShift];
+
+    shiftItems.forEach(function(item, index) {
+      var dayLabel = '';
+      if (item.date) {
+        dayLabel = '毎月' + item.date + '日';
+      } else if (item.days && item.days.length > 0) {
+        dayLabel = item.days.join('・');
       }
-    }
 
-    function deleteItem(index) {
-      items[editingShift].splice(index, 1);
-      saveData(STORAGE_KEYS.items, items);
-      renderEditList();
+      var li = document.createElement('li');
+      li.className = 'edit-list-item';
+
+      // 上部：テキストとバッジ
+      var topDiv = document.createElement('div');
+      topDiv.className = 'edit-item-top';
       
-      if (editingShift === currentShift) {
-        renderChecklist();
-        updateProgress();
-      }
-    }
+      var textSpan = document.createElement('span');
+      textSpan.className = 'item-text';
+      textSpan.textContent = item.text;
+      topDiv.appendChild(textSpan);
 
-    function openEditModal(index) {
-      editingIndex = index;
-      const item = items[editingShift][index];
-
-      document.getElementById('editItemInput').value = item.text;
-      document.getElementById('editItemDate').value = item.date || '';
-
-      // 曜日チェックボックスを生成
-      const daysContainer = document.getElementById('editItemDays');
-      const allDays = ['毎日', '月', '火', '水', '木', '金', '土', '日'];
-      daysContainer.innerHTML = allDays.map(d => `
-        <label>
-          <input type="checkbox" value="${d}" ${item.days.includes(d) ? 'checked' : ''}>
-          <span>${d}</span>
-        </label>
-      `).join('');
-
-      setupDaySelectLogic('editItemDays');
-      document.getElementById('editModal').classList.add('active');
-    }
-
-    function closeEditModal() {
-      editingIndex = -1;
-      document.getElementById('editModal').classList.remove('active');
-    }
-
-    function confirmEdit() {
-      const text = document.getElementById('editItemInput').value.trim();
-      if (!text || editingIndex < 0) return;
-
-      const dayCheckboxes = document.querySelectorAll('#editItemDays input:checked');
-      const days = Array.from(dayCheckboxes).map(cb => cb.value);
-      
-      const dateInput = document.getElementById('editItemDate');
-      const date = dateInput.value ? parseInt(dateInput.value) : null;
-
-      items[editingShift][editingIndex] = { text, days, date };
-      saveData(STORAGE_KEYS.items, items);
-
-      closeEditModal();
-      renderEditList();
-      
-      if (editingShift === currentShift) {
-        renderChecklist();
-        updateProgress();
-      }
-    }
-
-    // ========== 履歴 ==========
-    function renderHistory() {
-      const container = document.getElementById('historyList');
-      
-      if (history.length === 0) {
-        container.innerHTML = '<div class="no-history">まだ履歴がありません</div>';
-        return;
+      if (dayLabel) {
+        var badge = document.createElement('span');
+        badge.className = 'day-badge';
+        badge.textContent = dayLabel;
+        topDiv.appendChild(badge);
       }
 
-      container.innerHTML = history.slice(0, 50).map(record => {
-        const checkedCount = Object.values(record.checks).filter(v => v).length;
-        const totalCount = record.items.length;
+      // 下部：ボタン群
+      var bottomDiv = document.createElement('div');
+      bottomDiv.className = 'edit-item-bottom';
 
-        return `
-          <div class="history-item">
-            <div class="history-date">${record.date}</div>
-            <div class="history-shift">${record.shift}</div>
-            <div class="history-status">
-              <span class="badge ${record.allChecked ? 'complete' : 'incomplete'}">
-                ${record.allChecked ? '完了' : '未完了'}
-              </span>
-              <span class="history-meta">${checkedCount}/${totalCount} • ${record.time}</span>
-            </div>
-            <details class="history-details">
-              <summary>詳細を表示</summary>
-              <ul>
-                ${record.items.map((item, i) => `
-                  <li class="${record.checks[i] ? 'checked' : ''}">
-                    ${record.checks[i] ? '✓' : '−'} ${item}
-                  </li>
-                `).join('')}
-              </ul>
-            </details>
-          </div>
-        `;
+      var moveGroup = document.createElement('div');
+      moveGroup.className = 'move-group';
+
+      var upBtn = document.createElement('button');
+      upBtn.className = 'move-btn';
+      upBtn.textContent = '↑上へ';
+      upBtn.addEventListener('click', function() { moveItem(index, -1); });
+
+      var downBtn = document.createElement('button');
+      downBtn.className = 'move-btn';
+      downBtn.textContent = '↓下へ';
+      downBtn.addEventListener('click', function() { moveItem(index, 1); });
+
+      moveGroup.appendChild(upBtn);
+      moveGroup.appendChild(downBtn);
+
+      var actionGroup = document.createElement('div');
+      actionGroup.className = 'action-group';
+
+      var editBtn = document.createElement('button');
+      editBtn.className = 'edit-btn';
+      editBtn.textContent = '編集';
+      editBtn.addEventListener('click', function() { openEditModal(index); });
+
+      var deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.textContent = '削除';
+      deleteBtn.addEventListener('click', function() { deleteItem(index); });
+
+      actionGroup.appendChild(editBtn);
+      actionGroup.appendChild(deleteBtn);
+
+      bottomDiv.appendChild(moveGroup);
+      bottomDiv.appendChild(actionGroup);
+
+      li.appendChild(topDiv);
+      li.appendChild(bottomDiv);
+      container.appendChild(li);
+    });
+  }
+
+  /**
+   * 履歴を描画
+   */
+  function renderHistory() {
+    var container = document.getElementById('historyList');
+
+    if (state.history.length === 0) {
+      container.innerHTML = '<div class="no-history">まだ履歴がありません</div>';
+      return;
+    }
+
+    var html = '';
+    var displayHistory = state.history.slice(0, 50);
+
+    displayHistory.forEach(function(record) {
+      var checkedItems = record.checkedItems || {};
+      var ids = Object.keys(checkedItems);
+      var totalCount = ids.length;
+      var checkedCount = ids.filter(function(id) {
+        return checkedItems[id].checked;
+      }).length;
+
+      var itemsHtml = ids.map(function(id) {
+        var item = checkedItems[id];
+        var isChecked = item.checked;
+        return '<li class="' + (isChecked ? 'checked' : '') + '">' +
+               (isChecked ? '✓ ' : '− ') + item.text + '</li>';
       }).join('');
+
+      html += '<div class="history-item">' +
+              '<div class="history-date">' + record.date + '</div>' +
+              '<div class="history-shift">' + record.shift + '</div>' +
+              '<div class="history-status">' +
+              '<span class="badge ' + (record.allChecked ? 'complete' : 'incomplete') + '">' +
+              (record.allChecked ? '完了' : '未完了') + '</span>' +
+              '<span class="history-meta">' + checkedCount + '/' + totalCount + ' • ' + record.time + '</span>' +
+              '</div>' +
+              '<details class="history-details">' +
+              '<summary>詳細を表示</summary>' +
+              '<ul>' + itemsHtml + '</ul>' +
+              '</details>' +
+              '</div>';
+    });
+
+    container.innerHTML = html;
+  }
+
+  // ========================================
+  // 項目編集機能
+  // ========================================
+
+  /**
+   * 項目を追加
+   */
+  function addItem() {
+    var textInput = document.getElementById('newItemText');
+    var text = textInput.value.trim();
+
+    if (!text) {
+      alert('項目を入力してください');
+      return;
     }
 
-    function resetHistory() {
-      history = [];
-      saveData(STORAGE_KEYS.history, history);
-      renderHistory();
-      checkAlreadyCompleted();
+    var days = getSelectedDays('newItemDays');
+    var dateValue = document.getElementById('newItemDate').value;
+    var date = dateValue ? parseInt(dateValue, 10) : null;
+
+    // 特定日が設定されている場合は曜日をクリア
+    if (date) {
+      days = [];
     }
 
-    function undoComplete() {
-      const todayKey = getTodayKey();
-      
-      // 今日の履歴を削除
-      const index = history.findIndex(h => 
-        h.dateKey === todayKey && h.shift === currentShift
-      );
-      
-      if (index >= 0) {
-        history.splice(index, 1);
-        saveData(STORAGE_KEYS.history, history);
-      }
-      
-      // チェックリストを再表示
+    if (!state.items[state.editingShift]) {
+      state.items[state.editingShift] = [];
+    }
+
+    state.items[state.editingShift].push({
+      id: generateId(),
+      text: text,
+      days: days,
+      date: date
+    });
+
+    saveToStorage(STORAGE_KEYS.items, state.items);
+
+    // 入力欄をリセット
+    textInput.value = '';
+    document.getElementById('newItemDate').value = '';
+    resetDaySelect('newItemDays');
+
+    renderEditList();
+
+    // 現在のシフトなら再描画
+    if (state.editingShift === state.currentShift) {
       renderChecklist();
       updateProgress();
-      checkAlreadyCompleted();
-      renderHistory();
+    }
+  }
+
+  /**
+   * 項目を移動
+   * @param {number} index
+   * @param {number} direction -1:上 / 1:下
+   */
+  function moveItem(index, direction) {
+    var items = state.items[state.editingShift];
+    var newIndex = index + direction;
+
+    if (newIndex < 0 || newIndex >= items.length) {
+      return;
     }
 
-    // ========== 起動 ==========
-    init();
-  </script>
+    var temp = items[index];
+    items[index] = items[newIndex];
+    items[newIndex] = temp;
+
+    saveToStorage(STORAGE_KEYS.items, state.items);
+    renderEditList();
+
+    if (state.editingShift === state.currentShift) {
+      renderChecklist();
+    }
+  }
+
+  /**
+   * 項目を削除
+   * @param {number} index
+   */
+  function deleteItem(index) {
+    if (!confirm('この項目を削除しますか？')) {
+      return;
+    }
+
+    state.items[state.editingShift].splice(index, 1);
+    saveToStorage(STORAGE_KEYS.items, state.items);
+    renderEditList();
+
+    if (state.editingShift === state.currentShift) {
+      renderChecklist();
+      updateProgress();
+    }
+  }
+
+  /**
+   * 編集モーダルを開く
+   * @param {number} index
+   */
+  function openEditModal(index) {
+    state.editingIndex = index;
+    var item = state.items[state.editingShift][index];
+
+    document.getElementById('editItemInput').value = item.text;
+    document.getElementById('editItemDate').value = item.date || '';
+
+    // 曜日チェックボックスを生成
+    var daysContainer = document.getElementById('editItemDays');
+    var allDays = ['毎日', '月', '火', '水', '木', '金', '土', '日'];
+    daysContainer.innerHTML = '';
+
+    allDays.forEach(function(day) {
+      var isChecked = item.days && item.days.indexOf(day) !== -1;
+      var label = document.createElement('label');
+      var input = document.createElement('input');
+      input.type = 'checkbox';
+      input.value = day;
+      input.checked = isChecked;
+      var span = document.createElement('span');
+      span.textContent = day;
+      label.appendChild(input);
+      label.appendChild(span);
+      daysContainer.appendChild(label);
+    });
+
+    setupDaySelectLogic('editItemDays');
+    document.getElementById('editModal').classList.add('show');
+  }
+
+  /**
+   * 編集モーダルを閉じる
+   */
+  function closeEditModal() {
+    document.getElementById('editModal').classList.remove('show');
+    state.editingIndex = -1;
+  }
+
+  /**
+   * 編集を確定
+   */
+  function confirmEdit() {
+    var text = document.getElementById('editItemInput').value.trim();
+
+    if (!text) {
+      alert('項目を入力してください');
+      return;
+    }
+
+    var days = getSelectedDays('editItemDays');
+    var dateValue = document.getElementById('editItemDate').value;
+    var date = dateValue ? parseInt(dateValue, 10) : null;
+
+    if (date) {
+      days = [];
+    }
+
+    var item = state.items[state.editingShift][state.editingIndex];
+    item.text = text;
+    item.days = days;
+    item.date = date;
+
+    saveToStorage(STORAGE_KEYS.items, state.items);
+    closeEditModal();
+    renderEditList();
+
+    if (state.editingShift === state.currentShift) {
+      renderChecklist();
+      updateProgress();
+    }
+  }
+
+  // ========================================
+  // 曜日選択ヘルパー
+  // ========================================
+
+  /**
+   * 選択された曜日を取得
+   * @param {string} containerId
+   * @returns {string[]}
+   */
+  function getSelectedDays(containerId) {
+    var container = document.getElementById(containerId);
+    var checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
+    var days = [];
+    checkboxes.forEach(function(cb) {
+      days.push(cb.value);
+    });
+    return days;
+  }
+
+  /**
+   * 曜日選択をリセット
+   * @param {string} containerId
+   */
+  function resetDaySelect(containerId) {
+    var container = document.getElementById(containerId);
+    var checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(function(cb) {
+      cb.checked = (cb.value === '毎日');
+    });
+  }
+
+  /**
+   * 曜日選択の排他ロジックを設定
+   * @param {string} containerId
+   */
+  function setupDaySelectLogic(containerId) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    var checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(function(cb) {
+      cb.addEventListener('change', function() {
+        if (this.value === '毎日' && this.checked) {
+          // 「毎日」がチェックされたら他を外す
+          checkboxes.forEach(function(other) {
+            if (other.value !== '毎日') {
+              other.checked = false;
+            }
+          });
+        } else if (this.value !== '毎日' && this.checked) {
+          // 特定曜日がチェックされたら「毎日」を外す
+          var everyday = container.querySelector('input[value="毎日"]');
+          if (everyday) {
+            everyday.checked = false;
+          }
+        }
+      });
+    });
+  }
+
+  // ========================================
+  // バックアップ・復元
+  // ========================================
+
+  /**
+   * バックアップをエクスポート
+   */
+  function exportBackup() {
+    var backup = {
+      version: BACKUP_VERSION,
+      exportDate: new Date().toISOString(),
+      items: state.items,
+      history: state.history,
+      todayChecks: state.todayChecks,
+      currentShift: state.currentShift
+    };
+
+    var text = JSON.stringify(backup);
+
+    // モーダル表示
+    var modal = document.createElement('div');
+    modal.id = 'backupModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;';
+
+    var inner = document.createElement('div');
+    inner.style.cssText = 'background:white;border-radius:12px;padding:20px;width:100%;max-height:80%;overflow:auto;';
+    inner.innerHTML = 
+      '<h3 style="margin-bottom:12px;">バックアップデータ</h3>' +
+      '<p style="font-size:0.85rem;color:#666;margin-bottom:12px;">下のテキストを長押し→すべてを選択→コピーして、メモ帳に保存してください</p>' +
+      '<textarea id="backupTextArea" readonly style="width:100%;height:180px;font-size:11px;padding:8px;border:1px solid #ccc;border-radius:8px;background:#f9f9f9;"></textarea>' +
+
+```
+  '<button id="closeBackupBtn" style="width:100%;padding:14px;background:#B8860B;color:white;border:none;border-radius:8px;font-weight:500;margin-top:12px;cursor:pointer;">閉じる</button>';
+
+modal.appendChild(inner);
+document.body.appendChild(modal);
+
+document.getElementById('backupTextArea').value = text;
+document.getElementById('closeBackupBtn').addEventListener('click', function() {
+  modal.remove();
+});
+```
+
+}
+window.exportBackup = exportBackup;
+
+/**
+
+- 復元モーダルを表示
+  */
+  function showRestoreModal() {
+  var modal = document.createElement(‘div’);
+  modal.id = ‘restoreModal’;
+  modal.style.cssText = ‘position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;’;
+
+```
+var inner = document.createElement('div');
+inner.style.cssText = 'background:white;border-radius:12px;padding:20px;width:100%;';
+inner.innerHTML = 
+  '<h3 style="margin-bottom:12px;">バックアップから復元</h3>' +
+  '<p style="font-size:0.85rem;color:#666;margin-bottom:12px;">メモ帳に保存したバックアップデータを貼り付けてください</p>' +
+  '<textarea id="restoreTextArea" placeholder="ここに貼り付け" style="width:100%;height:150px;font-size:11px;padding:8px;border:1px solid #ccc;border-radius:8px;"></textarea>' +
+  '<div style="display:flex;gap:8px;margin-top:12px;">' +
+  '<button id="doRestoreBtn" style="flex:1;padding:14px;background:#B8860B;color:white;border:none;border-radius:8px;font-weight:500;cursor:pointer;">復元する</button>' +
+  '<button id="cancelRestoreBtn" style="flex:1;padding:14px;background:#E8E4DB;border:none;border-radius:8px;font-weight:500;cursor:pointer;">キャンセル</button>' +
+  '</div>';
+
+modal.appendChild(inner);
+document.body.appendChild(modal);
+
+document.getElementById('doRestoreBtn').addEventListener('click', function() {
+  var text = document.getElementById('restoreTextArea').value.trim();
+  if (!text) {
+    alert('バックアップデータを貼り付けてください');
+    return;
+  }
+  restoreBackup(text, modal);
+});
+
+document.getElementById('cancelRestoreBtn').addEventListener('click', function() {
+  modal.remove();
+});
+```
+
+}
+window.showRestoreModal = showRestoreModal;
+
+/**
+
+- バックアップから復元
+- @param {string} text JSON文字列
+- @param {HTMLElement} modal
+  */
+  function restoreBackup(text, modal) {
+  try {
+  var backup = JSON.parse(text);
+  
+  if (!backup.items) {
+  alert(‘無効なバックアップデータです’);
+  return;
+  }
+  
+  // データを復元
+  state.items = migrateItems(backup.items);
+  state.history = migrateHistory(backup.history || []);
+  state.todayChecks = backup.todayChecks || {};
+  
+  // currentShiftは復元しない（現在の画面状態を維持）
+  
+  // 保存
+  saveToStorage(STORAGE_KEYS.items, state.items);
+  saveToStorage(STORAGE_KEYS.history, state.history);
+  saveToStorage(STORAGE_KEYS.todayChecks, state.todayChecks);
+  
+  // 再描画
+  renderEditList();
+  renderHistory();
+  if (state.currentShift) {
+  renderChecklist();
+  updateProgress();
+  updateCompletedState();
+  }
+  
+  modal.remove();
+  alert(‘復元が完了しました！’);
+
+```
+} catch (e) {
+  console.error('復元エラー:', e);
+  alert('データの形式が正しくありません');
+}
+```
+
+}
+
+/**
+
+- 履歴をクリア
+  */
+  function resetHistory() {
+  // 直接削除（confirmがブロックされる環境対策）
+  state.history = [];
+  saveToStorage(STORAGE_KEYS.history, state.history);
+  renderHistory();
+  updateCompletedState();
+  alert(‘履歴を削除しました’);
+  }
+  window.resetHistory = resetHistory;
+
+// ========================================
+// シフト選択
+// ========================================
+
+/**
+
+- シフトを選択
+- @param {string} shift
+  */
+  function selectShift(shift) {
+  state.currentShift = shift;
+  state.editingShift = shift;
+  saveToStorage(STORAGE_KEYS.currentShift, shift);
+
+```
+document.getElementById('currentShiftName').textContent = shift;
+document.getElementById('shiftSelectScreen').style.display = 'none';
+document.getElementById('mainScreen').classList.add('active');
+
+renderChecklist();
+renderEditShiftTabs();
+renderEditList();
+updateProgress();
+updateCompletedState();
+```
+
+}
+
+/**
+
+- シフト変更画面に戻る
+  */
+  function changeShift() {
+  document.getElementById(‘shiftSelectScreen’).style.display = ‘block’;
+  document.getElementById(‘mainScreen’).classList.remove(‘active’);
+  }
+
+// ========================================
+// タブ切り替え
+// ========================================
+
+/**
+
+- タブを設定
+  */
+  function setupTabs() {
+  var tabs = document.querySelectorAll(’.tab’);
+  tabs.forEach(function(tab) {
+  tab.addEventListener(‘click’, function() {
+  var tabName = this.getAttribute(‘data-tab’);
+  
+  tabs.forEach(function(t) {
+  t.classList.remove(‘active’);
+  });
+  this.classList.add(‘active’);
+  
+  document.querySelectorAll(’.panel’).forEach(function(panel) {
+  panel.classList.remove(‘active’);
+  });
+  document.getElementById(tabName + ‘Panel’).classList.add(‘active’);
+  });
+  });
+  }
+
+// ========================================
+// イベントリスナー設定
+// ========================================
+
+/**
+
+- すべてのイベントリスナーを設定
+  */
+  function setupEventListeners() {
+  // シフト選択ボタン
+  document.querySelectorAll(’.shift-btn’).forEach(function(btn) {
+  btn.addEventListener(‘click’, function() {
+  var shift = this.getAttribute(‘data-shift’);
+  selectShift(shift);
+  });
+  });
+
+```
+// シフト変更ボタン
+document.getElementById('changeShiftBtn').addEventListener('click', changeShift);
+
+// 完了取り消しボタン
+document.getElementById('undoCompleteBtn').addEventListener('click', undoComplete);
+
+// 完了ボタン
+document.getElementById('completeBtn').addEventListener('click', completeCheck);
+
+// 項目追加ボタン
+document.getElementById('addItemBtn').addEventListener('click', addItem);
+
+// 編集モーダル
+document.getElementById('editModalCancel').addEventListener('click', closeEditModal);
+document.getElementById('editModalConfirm').addEventListener('click', confirmEdit);
+
+// バックアップ・復元
+document.getElementById('exportBackupBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  exportBackup();
+});
+document.getElementById('showRestoreBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  showRestoreModal();
+});
+document.getElementById('resetHistoryBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  resetHistory();
+});
+
+// タブ
+setupTabs();
+
+// 曜日選択ロジック
+setupDaySelectLogic('newItemDays');
+
+// ページがフォーカスされた時に日付変更をチェック
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden && checkDateChange()) {
+    renderChecklist();
+    updateProgress();
+    updateCompletedState();
+  }
+});
+```
+
+}
+
+// ========================================
+// 初期化
+// ========================================
+
+/**
+
+- アプリケーションを初期化
+  */
+  function init() {
+  // データ読み込み
+  var rawItems = loadFromStorage(STORAGE_KEYS.items, null);
+  if (rawItems === null) {
+  state.items = createDefaultItems();
+  saveToStorage(STORAGE_KEYS.items, state.items);
+  } else {
+  state.items = migrateItems(rawItems);
+  // マイグレーション後のデータを保存
+  saveToStorage(STORAGE_KEYS.items, state.items);
+  }
+
+```
+state.todayChecks = loadFromStorage(STORAGE_KEYS.todayChecks, {});
+state.history = migrateHistory(loadFromStorage(STORAGE_KEYS.history, []));
+state.currentShift = loadFromStorage(STORAGE_KEYS.currentShift, null);
+state.editingShift = state.currentShift || SHIFTS[0];
+
+// 日付変更チェック
+if (checkDateChange()) {
+  state.todayChecks = {};
+}
+
+// UI初期化
+document.getElementById('dateDisplay').textContent = getTodayString();
+
+if (state.currentShift) {
+  document.getElementById('currentShiftName').textContent = state.currentShift;
+  document.getElementById('shiftSelectScreen').style.display = 'none';
+  document.getElementById('mainScreen').classList.add('active');
+}
+
+renderChecklist();
+renderEditShiftTabs();
+renderEditList();
+renderHistory();
+updateProgress();
+updateCompletedState();
+setupEventListeners();
+```
+
+}
+
+// アプリ起動
+if (document.readyState === ‘loading’) {
+document.addEventListener(‘DOMContentLoaded’, init);
+} else {
+init();
+}
+
+})();
+</script>
 
 </body>
 </html>
