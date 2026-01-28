@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>麻雀成績管理</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f5f5f5; color: #333; padding: 12px; max-width: 500px; margin: 0 auto; }
+        h1 { text-align: center; color: #1a5f3c; font-size: 1.4rem; margin-bottom: 6px; border-bottom: 2px solid #d4af37; padding-bottom: 6px; }
+        .date { text-align: center; color: #888; font-size: 0.85rem; margin-bottom: 12px; }
+        .rules { background: #1a5f3c; color: white; padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 0.8rem; }
+        .rules b { color: #d4af37; }
+        .card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 1rem; color: #1a5f3c; margin-bottom: 10px; }
+
+```
+    /* 入力行 */
+    .input-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+    .input-row .player-name { width: 65px; font-weight: bold; font-size: 0.9rem; }
+    .input-row input {
+        flex: 1;
+        padding: 10px;
+        font-size: 1rem;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        text-align: right;
+        min-width: 0;
+    }
+    .input-row input:focus { outline: none; border-color: #1a5f3c; }
+    .input-row .unit { color: #888; font-size: 0.8rem; width: 20px; }
+    
+    /* ±トグルボタン - 2つのボタンを切り替え */
+    .toggle-wrap {
+        position: relative;
+        width: 44px;
+        height: 40px;
+        flex-shrink: 0;
+    }
+    .toggle-btn {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 44px;
+        height: 40px;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-weight: bold;
+        font-size: 1.4rem;
+        cursor: pointer;
+        line-height: 40px;
+        text-align: center;
+    }
+    .toggle-plus {
+        background: #27ae60;
+    }
+    .toggle-minus {
+        background: #c0392b;
+    }
+    .toggle-btn.hidden {
+        visibility: hidden;
+    }
+    
+    .error { color: #c0392b; font-size: 0.8rem; margin: 6px 0; display: none; }
+    
+    /* ボタン */
+    .btn { display: inline-block; padding: 14px 20px; font-size: 1rem; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; }
+    .btn-full { display: block; width: 100%; }
+    .btn-green { background: #1a5f3c; color: white; }
+    .btn-yellow { background: #d4af37; color: #333; }
+    .btn-gray { background: #6c757d; color: white; }
+    .btn-red { background: #c0392b; color: white; }
+    .btn-outline { background: white; border: 2px solid #1a5f3c; color: #1a5f3c; }
+    .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+    .btn-row .btn { flex: 1; }
+    
+    /* 残り計算ボタン */
+    .calc-btn-row { margin-bottom: 10px; }
+    .calc-btn-row .btn { padding: 10px; font-size: 0.9rem; }
+    
+    /* テーブル */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 8px; }
+    th, td { padding: 8px 4px; text-align: center; border: 1px solid #ddd; }
+    th { background: #1a5f3c; color: white; }
+    .positive { color: #27ae60; font-weight: bold; }
+    .negative { color: #c0392b; font-weight: bold; }
+    .top-row { background: #fffbe6; }
+    
+    /* 履歴 */
+    .game-item { background: #fafafa; border-left: 3px solid #1a5f3c; padding: 10px; margin-bottom: 10px; }
+    .game-header { font-weight: bold; color: #1a5f3c; margin-bottom: 8px; }
+    
+    /* 修正削除カード */
+    .action-card { background: #fff3cd; border: 2px solid #d4af37; }
+    .action-card .input-row select { flex: 1; padding: 10px; font-size: 1rem; border: 2px solid #ddd; border-radius: 6px; }
+    
+    /* モーダル */
+    .modal-bg { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
+    .modal-bg.show { display: flex; }
+    .modal { background: white; border-radius: 10px; padding: 16px; width: 100%; max-width: 350px; max-height: 90vh; overflow-y: auto; }
+    .modal h3 { color: #1a5f3c; margin-bottom: 12px; }
+    
+    .no-print { }
+    @media print { .no-print { display: none !important; } }
+</style>
+```
+
+</head>
+<body>
+
+<div id="mainArea">
+    <h1>🀄 麻雀成績管理</h1>
+    <div class="date" id="dateArea"></div>
+
+```
+<div class="rules">
+    <b>📋 ルール:</b> 3万点返し / ウマ10-20 / オカ15と5 / 点5 / 赤4枚
+</div>
+
+<div class="card no-print">
+    <h2>🎯 対局結果入力</h2>
+    <div id="inputArea"></div>
+    <div class="calc-btn-row">
+        <button class="btn btn-outline btn-full" id="btnCalcLast">🔢 残り1人を自動計算</button>
+    </div>
+    <div class="error" id="errorMsg"></div>
+    <button class="btn btn-green btn-full" id="btnRecord">記録する</button>
+</div>
+
+<!-- 修正・削除用のカード -->
+<div class="card action-card no-print" id="actionCard" style="display:none;">
+    <h2>✏️ 対局の修正・削除</h2>
+    <div class="input-row">
+        <span class="player-name">対象</span>
+        <select id="targetGame"></select>
+    </div>
+    <div class="btn-row">
+        <button class="btn btn-gray" id="btnEdit">修正</button>
+        <button class="btn btn-red" id="btnDelete">削除</button>
+    </div>
+</div>
+
+<div class="card" id="totalCard" style="display:none;">
+    <h2>📊 トータル成績</h2>
+    <div id="totalArea"></div>
+</div>
+
+<div class="card" id="historyCard" style="display:none;">
+    <h2>📝 対局履歴</h2>
+    <div id="historyArea"></div>
+</div>
+```
+
+</div>
+
+<div class="btn-row no-print" id="actionBtns" style="display:none;">
+    <button class="btn btn-yellow btn-full" id="btnCopy">📋 結果をコピー</button>
+</div>
+
+<div class="modal-bg" id="editModal">
+    <div class="modal">
+        <h3>📝 第<span id="editNum"></span>回戦を修正</h3>
+        <div id="editInputArea"></div>
+        <div class="calc-btn-row">
+            <button class="btn btn-outline btn-full" id="btnCalcLastEdit">🔢 残り1人を自動計算</button>
+        </div>
+        <div class="error" id="editErrorMsg"></div>
+        <div class="btn-row">
+            <button class="btn btn-gray" id="btnCancelEdit">キャンセル</button>
+            <button class="btn btn-green" id="btnSaveEdit">保存</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const PLAYERS = ['江川', '伊藤', 'たくみ', '本田さん'];
+const RULES = { returnPoint: 30000, uma: [20, 10, -10, -20], oka: [15, 5, 0, 0], rate: 50 };
+const TOTAL_POINTS = 100000;
+
+let games = [];
+let totals = {};
+let editingGameNumber = null;
+
+// ========================================
+// 初期化
+// ========================================
+function init() {
+    document.getElementById('dateArea').textContent = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+
+    // 入力フォーム生成
+    document.getElementById('inputArea').innerHTML = createInputRowsHTML('inp');
+    
+    // totals初期化
+    PLAYERS.forEach(p => totals[p] = 0);
+
+    // イベントリスナー設定
+    document.getElementById('btnRecord').addEventListener('click', recordGame);
+    document.getElementById('btnCalcLast').addEventListener('click', () => calcLastPlayer('inp'));
+    document.getElementById('btnEdit').addEventListener('click', openEditModal);
+    document.getElementById('btnDelete').addEventListener('click', doDelete);
+    document.getElementById('btnCopy').addEventListener('click', copyResult);
+    document.getElementById('btnCancelEdit').addEventListener('click', closeModal);
+    document.getElementById('btnSaveEdit').addEventListener('click', saveEdit);
+    document.getElementById('btnCalcLastEdit').addEventListener('click', () => calcLastPlayer('editInp'));
+    
+    document.getElementById('editModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('editModal')) closeModal();
+    });
+
+    // ±ボタンのイベント設定
+    setupToggleButtons('inp');
+
+    loadData();
+}
+
+// ========================================
+// 入力行HTML生成
+// ========================================
+function createInputRowsHTML(prefix) {
+    return PLAYERS.map((player, i) => `
+        <div class="input-row">
+            <span class="player-name">${player}</span>
+            <div class="toggle-wrap">
+                <button type="button" class="toggle-btn toggle-plus" id="${prefix}Plus${i}">＋</button>
+                <button type="button" class="toggle-btn toggle-minus hidden" id="${prefix}Minus${i}">ー</button>
+            </div>
+            <input type="tel" id="${prefix}${i}" placeholder="25000">
+            <span class="unit">点</span>
+        </div>
+    `).join('');
+}
+
+// ========================================
+// ±トグルボタンの設定（2ボタン方式）
+// ========================================
+function setupToggleButtons(prefix) {
+    PLAYERS.forEach((_, i) => {
+        const plusBtn = document.getElementById(`${prefix}Plus${i}`);
+        const minusBtn = document.getElementById(`${prefix}Minus${i}`);
+        if (plusBtn) {
+            plusBtn.addEventListener('click', () => toggleToMinus(prefix, i));
+        }
+        if (minusBtn) {
+            minusBtn.addEventListener('click', () => toggleToPlus(prefix, i));
+        }
+    });
+}
+
+function toggleToMinus(prefix, index) {
+    const plusBtn = document.getElementById(`${prefix}Plus${index}`);
+    const minusBtn = document.getElementById(`${prefix}Minus${index}`);
+    plusBtn.classList.add('hidden');
+    minusBtn.classList.remove('hidden');
+}
+
+function toggleToPlus(prefix, index) {
+    const plusBtn = document.getElementById(`${prefix}Plus${index}`);
+    const minusBtn = document.getElementById(`${prefix}Minus${index}`);
+    plusBtn.classList.remove('hidden');
+    minusBtn.classList.add('hidden');
+}
+
+function isNegativeMode(prefix, index) {
+    const minusBtn = document.getElementById(`${prefix}Minus${index}`);
+    return minusBtn && !minusBtn.classList.contains('hidden');
+}
+
+function setNegativeMode(prefix, index, negative) {
+    if (negative) {
+        toggleToMinus(prefix, index);
+    } else {
+        toggleToPlus(prefix, index);
+    }
+}
+
+// ========================================
+// 残り1人自動計算
+// ========================================
+function calcLastPlayer(prefix) {
+    const values = [];
+    let emptyIndex = -1;
+    let emptyCount = 0;
+    
+    PLAYERS.forEach((_, i) => {
+        const input = document.getElementById(`${prefix}${i}`);
+        let val = parsePoint(input.value);
+        
+        if (isNaN(val) || input.value.trim() === '') {
+            emptyCount++;
+            emptyIndex = i;
+            values.push(null);
+        } else {
+            // ±ボタンの状態を反映
+            if (isNegativeMode(prefix, i)) {
+                val = -Math.abs(val);
+            }
+            values.push(val);
+        }
+    });
+    
+    if (emptyCount !== 1) {
+        alert('3人の点数を入力してから押してください');
+        return;
+    }
+    
+    const sum = values.filter(v => v !== null).reduce((a, b) => a + b, 0);
+    const lastValue = TOTAL_POINTS - sum;
+    
+    const input = document.getElementById(`${prefix}${emptyIndex}`);
+    
+    input.value = Math.abs(lastValue);
+    setNegativeMode(prefix, emptyIndex, lastValue < 0);
+}
+
+// ========================================
+// 点数パース（全角対応・符号対応）
+// ========================================
+function parsePoint(val) {
+    if (val === '' || val === null || val === undefined) return NaN;
+    const s = String(val).replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+        .replace(/ー|−/g, '-').replace(/,/g, '').trim();
+    return parseInt(s, 10);
+}
+
+// ========================================
+// 入力値取得（±ボタンの状態を反映）
+// ========================================
+function getInputPoints(prefix) {
+    const pts = [];
+    for (let i = 0; i < PLAYERS.length; i++) {
+        const input = document.getElementById(`${prefix}${i}`);
+        let val = parsePoint(input.value);
+        
+        if (isNaN(val)) {
+            return { error: `${PLAYERS[i]}の点数を入力してください`, points: null };
+        }
+        
+        // ±ボタンがマイナス状態なら負に変換
+        if (isNegativeMode(prefix, i)) {
+            val = -Math.abs(val);
+        } else {
+            val = Math.abs(val);
+        }
+        
+        pts.push(val);
+    }
+    return { error: null, points: pts };
+}
+
+// ========================================
+// スコア計算（ゼロサム保証・同点は上家優先）
+// ========================================
+function calcScores(points) {
+    const arr = PLAYERS.map((player, i) => ({ player, points: points[i], idx: i }));
+    arr.sort((a, b) => b.points !== a.points ? b.points - a.points : a.idx - b.idx);
+
+    const scores = {};
+    arr.forEach((item, rank) => {
+        const sc = (item.points - RULES.returnPoint) / 1000 + RULES.uma[rank] + RULES.oka[rank];
+        scores[item.player] = Math.round(sc * 10) / 10;
+    });
+
+    // ゼロサム調整
+    let sum = Object.values(scores).reduce((a, b) => a + b, 0);
+    sum = Math.round(sum * 10) / 10;
+    if (sum !== 0) {
+        scores[arr[0].player] = Math.round((scores[arr[0].player] - sum) * 10) / 10;
+    }
+
+    return { scores, ranked: arr.map(x => x.player) };
+}
+
+// ========================================
+// トータル再計算（gamesから毎回計算）
+// ========================================
+function recalcTotals() {
+    PLAYERS.forEach(p => totals[p] = 0);
+    games.forEach(g => {
+        for (const p in g.scores) {
+            totals[p] += g.scores[p];
+        }
+    });
+    PLAYERS.forEach(p => totals[p] = Math.round(totals[p] * 10) / 10);
+}
+
+// ========================================
+// 対局記録
+// ========================================
+function recordGame() {
+    const errEl = document.getElementById('errorMsg');
+    errEl.style.display = 'none';
+
+    const { error, points } = getInputPoints('inp');
+    if (error) {
+        errEl.textContent = error;
+        errEl.style.display = 'block';
+        return;
+    }
+
+    const total = points.reduce((a, b) => a + b, 0);
+    if (total !== TOTAL_POINTS) {
+        errEl.textContent = `合計が${total.toLocaleString()}点です（10万点になるよう入力してください）`;
+        errEl.style.display = 'block';
+        return;
+    }
+
+    const result = calcScores(points);
+    games.push({ 
+        gameNumber: games.length + 1, 
+        points: [...points], 
+        scores: result.scores, 
+        ranked: result.ranked 
+    });
+    
+    recalcTotals();
+    render();
+    saveData();
+    
+    // 入力クリア
+    PLAYERS.forEach((_, i) => {
+        document.getElementById(`inp${i}`).value = '';
+        setNegativeMode('inp', i, false);
+    });
+}
+
+// ========================================
+// 表示更新
+// ========================================
+function render() {
+    const tc = document.getElementById('totalCard');
+    const hc = document.getElementById('historyCard');
+    const ab = document.getElementById('actionBtns');
+    const ac = document.getElementById('actionCard');
+    
+    if (games.length === 0) {
+        tc.style.display = 'none';
+        hc.style.display = 'none';
+        ab.style.display = 'none';
+        ac.style.display = 'none';
+        return;
+    }
+    
+    tc.style.display = 'block';
+    hc.style.display = 'block';
+    ab.style.display = 'flex';
+    ac.style.display = 'block';
+
+    // セレクトボックス更新
+    document.getElementById('targetGame').innerHTML = games.map(g => 
+        `<option value="${g.gameNumber}">第${g.gameNumber}回戦</option>`
+    ).join('');
+
+    // トータル成績
+    const sorted = [...PLAYERS].sort((a, b) => totals[b] - totals[a]);
+    let html = '<table><tr><th>順位</th><th>名前</th><th>スコア</th><th>精算額</th></tr>';
+    sorted.forEach((p, i) => {
+        const sc = totals[p];
+        const money = Math.round(sc * RULES.rate);
+        const cls = (i === 0 && sc > 0) ? 'top-row' : '';
+        const scCls = sc >= 0 ? 'positive' : 'negative';
+        html += `<tr class="${cls}"><td>${i + 1}位</td><td>${i === 0 && sc > 0 ? '👑 ' : ''}${p}</td>`;
+        html += `<td class="${scCls}">${sc >= 0 ? '+' : ''}${sc.toFixed(1)}</td>`;
+        html += `<td class="${scCls}">${money >= 0 ? '+' : ''}${money.toLocaleString()}円</td></tr>`;
+    });
+    document.getElementById('totalArea').innerHTML = html + '</table>';
+
+    // 履歴
+    let hHtml = '';
+    for (let i = games.length - 1; i >= 0; i--) {
+        const g = games[i];
+        hHtml += `<div class="game-item"><div class="game-header">第${g.gameNumber}回戦</div>`;
+        hHtml += '<table><tr><th>順位</th><th>名前</th><th>持ち点</th><th>スコア</th></tr>';
+        g.ranked.forEach((pl, r) => {
+            const pi = PLAYERS.indexOf(pl);
+            const pt = g.points[pi];
+            const sc = g.scores[pl];
+            hHtml += `<tr><td>${r + 1}位</td><td>${pl}</td><td>${pt.toLocaleString()}点</td>`;
+            hHtml += `<td class="${sc >= 0 ? 'positive' : 'negative'}">${sc >= 0 ? '+' : ''}${sc.toFixed(1)}</td></tr>`;
+        });
+        hHtml += '</table></div>';
+    }
+    document.getElementById('historyArea').innerHTML = hHtml;
+}
+
+// ========================================
+// 修正モーダル
+// ========================================
+function openEditModal() {
+    const gn = parseInt(document.getElementById('targetGame').value, 10);
+    if (isNaN(gn)) { alert('対象を選択してください'); return; }
+    
+    editingGameNumber = gn;
+    const g = games.find(game => game.gameNumber === gn);
+    if (!g) return;
+    
+    document.getElementById('editNum').textContent = gn;
+    document.getElementById('editInputArea').innerHTML = createInputRowsHTML('editInp');
+    
+    // ±ボタンのイベント設定（先に設定）
+    setupToggleButtons('editInp');
+    
+    // 値を設定
+    PLAYERS.forEach((_, i) => {
+        const input = document.getElementById(`editInp${i}`);
+        const val = g.points[i];
+        input.value = Math.abs(val);
+        setNegativeMode('editInp', i, val < 0);
+    });
+    
+    document.getElementById('editErrorMsg').style.display = 'none';
+    document.getElementById('editModal').classList.add('show');
+}
+
+function closeModal() {
+    editingGameNumber = null;
+    document.getElementById('editModal').classList.remove('show');
+}
+
+function saveEdit() {
+    if (editingGameNumber === null) return;
+    
+    const errEl = document.getElementById('editErrorMsg');
+    errEl.style.display = 'none';
+
+    const { error, points } = getInputPoints('editInp');
+    if (error) {
+        errEl.textContent = error;
+        errEl.style.display = 'block';
+        return;
+    }
+
+    const total = points.reduce((a, b) => a + b, 0);
+    if (total !== TOTAL_POINTS) {
+        errEl.textContent = `合計が${total.toLocaleString()}点です（10万点になるよう入力してください）`;
+        errEl.style.display = 'block';
+        return;
+    }
+
+    const result = calcScores(points);
+    const game = games.find(g => g.gameNumber === editingGameNumber);
+    if (game) {
+        game.points = [...points];
+        game.scores = result.scores;
+        game.ranked = result.ranked;
+    }
+    
+    recalcTotals();
+    render();
+    saveData();
+    closeModal();
+}
+
+// ========================================
+// 削除（confirmなし）
+// ========================================
+function doDelete() {
+    const selectEl = document.getElementById('targetGame');
+    const gn = parseInt(selectEl.value, 10);
+    
+    if (isNaN(gn) || games.length === 0) { 
+        alert('削除する対局がありません'); 
+        return; 
+    }
+    
+    games = games.filter(g => g.gameNumber !== gn);
+    games.forEach((g, i) => g.gameNumber = i + 1);
+    
+    recalcTotals();
+    render();
+    saveData();
+    
+    alert(`第${gn}回戦を削除しました`);
+}
+
+// ========================================
+// 結果コピー
+// ========================================
+function copyResult() {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
+    
+    let text = `🀄 麻雀成績 ${dateStr}\n`;
+    text += '━━━━━━━━━━━━━━━\n\n';
+    
+    text += '【トータル成績】\n';
+    const sorted = [...PLAYERS].sort((a, b) => totals[b] - totals[a]);
+    sorted.forEach((p, i) => {
+        const sc = totals[p];
+        const money = Math.round(sc * RULES.rate);
+        const crown = (i === 0 && sc > 0) ? '👑' : '　';
+        text += `${crown}${i + 1}位 ${p}：${sc >= 0 ? '+' : ''}${sc.toFixed(1)}pt（${money >= 0 ? '+' : ''}${money}円）\n`;
+    });
+    
+    text += '\n━━━━━━━━━━━━━━━\n\n';
+    
+    games.forEach(game => {
+        text += `【第${game.gameNumber}回戦】\n`;
+        game.ranked.forEach((pl, r) => {
+            const pi = PLAYERS.indexOf(pl);
+            const pt = game.points[pi];
+            const sc = game.scores[pl];
+            text += `${r + 1}位 ${pl}：${pt.toLocaleString()}点（${sc >= 0 ? '+' : ''}${sc.toFixed(1)}）\n`;
+        });
+        text += '\n';
+    });
+    
+    text += '━━━━━━━━━━━━━━━\n';
+    text += 'ルール：3万点返し/ウマ10-20/オカ15と5/点5\n';
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('コピーしました！\nLINEやメモ帳に貼り付けできます');
+        }).catch(() => fallbackCopy(text));
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        alert('コピーしました！\nLINEやメモ帳に貼り付けできます');
+    } catch (e) {
+        alert('コピーできませんでした');
+    }
+    document.body.removeChild(textarea);
+}
+
+// ========================================
+// データ保存・読込（gamesのみ保存）
+// ========================================
+function saveData() {
+    localStorage.setItem('mahjongGames', JSON.stringify(games));
+}
+
+function loadData() {
+    const saved = localStorage.getItem('mahjongGames');
+    if (saved) {
+        try {
+            games = JSON.parse(saved) || [];
+            recalcTotals();
+            render();
+        } catch (e) {
+            console.error('データ読み込みエラー:', e);
+        }
+    }
+}
+
+// 初期化実行
+init();
+</script>
+
+</body>
+</html>
