@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -28,883 +27,882 @@
 }
 
 input, textarea {
--webkit-user-select: text;
--moz-user-select: text;
--ms-user-select: text;
-user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 body {
-font-family: -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif;
-background: #FAF9F6;
-min-height: 100vh;
-color: #1a1a1a;
-line-height: 1.6;
-padding-bottom: env(safe-area-inset-bottom);
-padding-top: env(safe-area-inset-top);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  background: #FAF9F6;
+  min-height: 100vh;
+  color: #1a1a1a;
+  line-height: 1.6;
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: env(safe-area-inset-top);
 }
 
 @keyframes popBounce {
-0% { transform: scale(1); }
-30% { transform: scale(1.15); }
-50% { transform: scale(0.95); }
-70% { transform: scale(1.05); }
-100% { transform: scale(1); }
+  0% { transform: scale(1); }
+  30% { transform: scale(1.15); }
+  50% { transform: scale(0.95); }
+  70% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .checklist-item.pop-animation {
-animation: popBounce 0.3s ease-out;
+  animation: popBounce 0.3s ease-out;
 }
 
 /* ========================================
-レイアウト
+   レイアウト
 ======================================== */
 .container {
-max-width: 600px;
-margin: 0 auto;
-padding: 0 20px 120px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 20px 120px;
 }
 
 header {
-padding: 48px 20px 24px;
-text-align: center;
+  padding: 48px 20px 24px;
+  text-align: center;
 }
 
 header h1 {
-font-size: 1.6rem;
-font-weight: 600;
-background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 50%, #2E7D32 100%);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-background-clip: text;
-margin-bottom: 4px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 50%, #2E7D32 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
 }
 
 .version {
-font-size: 0.7rem;
-color: #9b9b9b;
-letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  color: #9b9b9b;
+  letter-spacing: 0.1em;
 }
 
 .date-display {
-font-size: 0.9rem;
-color: #6b6b6b;
-margin-top: 4px;
+  font-size: 0.9rem;
+  color: #6b6b6b;
+  margin-top: 4px;
 }
 
 /* ========================================
-シフト選択画面
+   シフト選択画面
 ======================================== */
 .shift-select-screen {
-padding: 40px 0;
+  padding: 40px 0;
 }
 
 .shift-buttons {
-display: flex;
-flex-direction: column;
-gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .shift-btn {
-padding: 20px 24px;
-background: #fff;
-border: 1px solid #E5E2DC;
-border-radius: 12px;
-font-size: 1rem;
-font-weight: 500;
-cursor: pointer;
-text-align: left;
-display: flex;
-justify-content: space-between;
-align-items: center;
-transition: transform 0.1s, background 0.1s;
+  padding: 20px 24px;
+  background: #fff;
+  border: 1px solid #E5E2DC;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.1s, background 0.1s;
 }
 
 .shift-btn:active {
-transform: scale(0.98);
-background: #E8F5E9;
+  transform: scale(0.98);
+  background: #E8F5E9;
 }
 
 .shift-btn .time {
-font-size: 0.85rem;
-color: #6b6b6b;
-font-weight: 400;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  font-weight: 400;
 }
 
 .add-shift-btn {
-padding: 16px 24px;
-background: #E8F5E9;
-border: 2px dashed #4CAF50;
-border-radius: 12px;
-font-size: 1rem;
-font-weight: 500;
-cursor: pointer;
-text-align: center;
-color: #2E7D32;
-transition: transform 0.1s, background 0.1s;
-margin-top: 8px;
+  padding: 16px 24px;
+  background: #E8F5E9;
+  border: 2px dashed #4CAF50;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  color: #2E7D32;
+  transition: transform 0.1s, background 0.1s;
+  margin-top: 8px;
 }
 
 .add-shift-btn:active {
-transform: scale(0.98);
-background: #C8E6C9;
+  transform: scale(0.98);
+  background: #C8E6C9;
 }
 
 .manage-shifts-btn {
-padding: 12px 24px;
-background: transparent;
-border: 1px solid #D4CFC5;
-border-radius: 8px;
-font-size: 0.9rem;
-cursor: pointer;
-text-align: center;
-color: #6b6b6b;
-margin-top: 20px;
-width: 100%;
+  padding: 12px 24px;
+  background: transparent;
+  border: 1px solid #D4CFC5;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: center;
+  color: #6b6b6b;
+  margin-top: 20px;
+  width: 100%;
 }
 
 /* ========================================
-メイン画面
+   メイン画面
 ======================================== */
 .main-screen {
-display: none;
+  display: none;
 }
 
 .main-screen.active {
-display: block;
+  display: block;
 }
 
 .shift-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 20px;
-padding-bottom: 16px;
-border-bottom: 1px solid #E5E2DC;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #E5E2DC;
 }
 
 .current-shift {
-font-size: 1.2rem;
-font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .current-shift-time {
-font-size: 0.85rem;
-color: #6b6b6b;
-font-weight: 400;
-margin-left: 8px;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  font-weight: 400;
+  margin-left: 8px;
 }
 
 .change-btn {
-padding: 8px 16px;
-background: transparent;
-border: 1px solid #D4CFC5;
-border-radius: 8px;
-font-size: 0.85rem;
-color: #6b6b6b;
-cursor: pointer;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #D4CFC5;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  cursor: pointer;
 }
 
 /* ========================================
-プログレスバー
+   プログレスバー
 ======================================== */
 .progress-section {
-margin-bottom: 24px;
-background: #fff;
-padding: 15px;
-border-radius: 12px;
-border: 1px solid #E5E2DC;
+  margin-bottom: 24px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #E5E2DC;
 }
 
 .progress-bar {
-height: 6px;
-background: #E8E4DB;
-border-radius: 3px;
-overflow: hidden;
-margin-bottom: 8px;
+  height: 6px;
+  background: #E8E4DB;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
 }
 
 .progress-fill {
-height: 100%;
-background: linear-gradient(90deg, #2E7D32, #4CAF50);
-transition: width 0.3s ease;
+  height: 100%;
+  background: linear-gradient(90deg, #2E7D32, #4CAF50);
+  transition: width 0.3s ease;
 }
 
 .progress-text {
-font-size: 0.85rem;
-color: #6b6b6b;
-text-align: right;
-font-weight: 600;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  text-align: right;
+  font-weight: 600;
 }
 
 /* ========================================
-チェックリスト
+   チェックリスト
 ======================================== */
 .checklist {
-display: flex;
-flex-direction: column;
-gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .checklist-item {
-display: flex;
-align-items: center;
-padding: 16px;
-background: #fff;
-border: 1px solid #E5E2DC;
-border-radius: 10px;
-gap: 12px;
-transition: background 0.2s, border-color 0.2s;
-cursor: pointer;
--webkit-user-select: none;
-user-select: none;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #E5E2DC;
+  border-radius: 10px;
+  gap: 12px;
+  transition: background 0.2s, border-color 0.2s;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .checklist-item.checked {
-background: #E8F5E9;
-border-color: #C8E6C9;
+  background: #E8F5E9;
+  border-color: #C8E6C9;
 }
 
 .checklist-item .item-text {
-flex: 1;
-font-size: 0.95rem;
+  flex: 1;
+  font-size: 0.95rem;
 }
 
 .checklist-item.checked .item-text {
-color: #558B2F;
-text-decoration: line-through;
+  color: #558B2F;
+  text-decoration: line-through;
 }
 
 .custom-checkbox {
-position: relative;
-width: 24px;
-height: 24px;
-flex-shrink: 0;
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
 }
 
 .custom-checkbox input {
-position: absolute;
-opacity: 0;
-width: 100%;
-height: 100%;
-cursor: pointer;
-z-index: 2;
-margin: 0;
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 2;
+  margin: 0;
 }
 
 .checkmark {
-position: absolute;
-top: 0;
-left: 0;
-width: 24px;
-height: 24px;
-background: #fff;
-border: 2px solid #D4CFC5;
-border-radius: 6px;
-pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border: 2px solid #D4CFC5;
+  border-radius: 6px;
+  pointer-events: none;
 }
 
 .custom-checkbox input:checked + .checkmark {
-background: #2E7D32;
-border-color: #2E7D32;
+  background: #2E7D32;
+  border-color: #2E7D32;
 }
 
 .custom-checkbox input:checked + .checkmark::after {
-content: ‘’;
-position: absolute;
-left: 7px;
-top: 3px;
-width: 6px;
-height: 11px;
-border: solid white;
-border-width: 0 2px 2px 0;
-transform: rotate(45deg);
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 3px;
+  width: 6px;
+  height: 11px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .day-badge {
-font-size: 0.75rem;
-padding: 2px 8px;
-background: #E8E4DB;
-color: #6b6b6b;
-border-radius: 4px;
-margin-left: 8px;
-white-space: nowrap;
-flex-shrink: 0;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  background: #E8E4DB;
+  color: #6b6b6b;
+  border-radius: 4px;
+  margin-left: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ========================================
-ナビゲーションタブ
+   ナビゲーションタブ
 ======================================== */
 .nav-tabs {
-position: fixed;
-bottom: 0;
-left: 0;
-right: 0;
-background: #fff;
-border-top: 1px solid #E5E2DC;
-display: flex;
-justify-content: space-around;
-padding: 12px 0;
-z-index: 100;
-padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #E5E2DC;
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 0;
+  z-index: 100;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
 }
 
 .tab {
-padding: 8px 20px;
-background: transparent;
-border: none;
-font-size: 0.9rem;
-color: #9b9b9b;
-border-radius: 8px;
-cursor: pointer;
+  padding: 8px 20px;
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  color: #9b9b9b;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .tab.active {
-background: #E8F5E9;
-color: #2E7D32;
-font-weight: 600;
+  background: #E8F5E9;
+  color: #2E7D32;
+  font-weight: 600;
 }
 
 /* ========================================
-パネル
+   パネル
 ======================================== */
 .panel {
-display: none;
+  display: none;
 }
 
 .panel.active {
-display: block;
+  display: block;
 }
 
 /* ========================================
-編集画面
+   編集画面
 ======================================== */
 .edit-shift-tabs {
-display: flex;
-gap: 8px;
-margin-bottom: 20px;
-flex-wrap: wrap;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .edit-shift-tab {
-padding: 8px 16px;
-background: #fff;
-border: 1px solid #E5E2DC;
-border-radius: 8px;
-font-size: 0.85rem;
-color: #6b6b6b;
-cursor: pointer;
+  padding: 8px 16px;
+  background: #fff;
+  border: 1px solid #E5E2DC;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  cursor: pointer;
 }
 
 .edit-shift-tab.active {
-background: #2E7D32;
-color: #fff;
-border-color: #2E7D32;
+  background: #2E7D32;
+  color: #fff;
+  border-color: #2E7D32;
 }
 
 .add-item-section {
-background: #fff;
-border: 1px solid #E5E2DC;
-border-radius: 12px;
-padding: 16px;
-margin-bottom: 20px;
+  background: #fff;
+  border: 1px solid #E5E2DC;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
 }
 
-.add-item-section input[type=“text”] {
-width: 100%;
-padding: 12px;
-border: 1px solid #E5E2DC;
-border-radius: 8px;
-font-size: 16px;
-margin-bottom: 12px;
+.add-item-section input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #E5E2DC;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 12px;
 }
 
 .day-select {
-display: flex;
-flex-wrap: wrap;
-gap: 8px;
-margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .day-select label {
-display: flex;
-align-items: center;
-gap: 4px;
-padding: 6px 12px;
-background: #E8F5E9;
-border-radius: 6px;
-font-size: 0.85rem;
-cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: #E8F5E9;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
 }
 
 .day-select input {
-display: none;
+  display: none;
 }
 
 .day-select input:checked + span {
-color: #2E7D32;
-font-weight: 600;
+  color: #2E7D32;
+  font-weight: 600;
 }
 
 .date-input-row {
-display: flex;
-align-items: center;
-gap: 8px;
-margin-bottom: 12px;
-font-size: 0.9rem;
-color: #6b6b6b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  color: #6b6b6b;
 }
 
 .date-input-row input {
-width: 60px;
-padding: 8px;
-border: 1px solid #E5E2DC;
-border-radius: 6px;
-font-size: 16px;
+  width: 60px;
+  padding: 8px;
+  border: 1px solid #E5E2DC;
+  border-radius: 6px;
+  font-size: 16px;
 }
 
 .add-btn {
-width: 100%;
-padding: 12px;
-background: #2E7D32;
-color: #fff;
-border: none;
-border-radius: 8px;
-font-size: 0.9rem;
-font-weight: 500;
-cursor: pointer;
+  width: 100%;
+  padding: 12px;
+  background: #2E7D32;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 .edit-list {
-list-style: none;
+  list-style: none;
 }
 
 .edit-list-item {
-background: #fff;
-border: 1px solid #E5E2DC;
-border-radius: 10px;
-padding: 15px;
-margin-bottom: 10px;
+  background: #fff;
+  border: 1px solid #E5E2DC;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
 }
 
 .edit-item-top {
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
-gap: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .edit-item-top .item-text {
-flex: 1;
-font-size: 0.95rem;
-word-break: break-word;
+  flex: 1;
+  font-size: 0.95rem;
+  word-break: break-word;
 }
 
 .edit-item-bottom {
-display: flex;
-gap: 8px;
-margin-top: 12px;
-padding-top: 12px;
-border-top: 1px solid #eee;
-flex-wrap: wrap;
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  flex-wrap: wrap;
 }
 
 .move-group {
-display: flex;
-gap: 4px;
+  display: flex;
+  gap: 4px;
 }
 
 .action-group {
-display: flex;
-gap: 8px;
-margin-left: auto;
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
 }
 
 .move-btn,
 .edit-btn {
-background: #E8E4DB;
-color: #6b6b6b;
-border: none;
-padding: 8px 12px;
-border-radius: 6px;
-font-size: 0.8rem;
-cursor: pointer;
+  background: #E8E4DB;
+  color: #6b6b6b;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
 }
 
 .delete-btn {
-color: #C53030;
-background: #FEE;
-border: none;
-padding: 8px 12px;
-border-radius: 6px;
-font-size: 0.8rem;
-cursor: pointer;
+  color: #C53030;
+  background: #FEE;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
 }
 
 /* ========================================
-完了ボタン
+   完了ボタン
 ======================================== */
 .complete-btn {
-width: 100%;
-padding: 18px;
-background: linear-gradient(135deg, #2E7D32, #4CAF50);
-color: #fff;
-border: none;
-border-radius: 12px;
-font-size: 1rem;
-font-weight: 600;
-margin-top: 20px;
-cursor: pointer;
-transition: transform 0.1s;
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, #2E7D32, #4CAF50);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: transform 0.1s;
 }
 
 .complete-btn:disabled {
-background: #E8E4DB;
-color: #9b9b9b;
-cursor: not-allowed;
+  background: #E8E4DB;
+  color: #9b9b9b;
+  cursor: not-allowed;
 }
 
 .complete-btn:not(:disabled):active {
-transform: scale(0.98);
+  transform: scale(0.98);
 }
 
 /* ========================================
-完了済み表示
+   完了済み表示
 ======================================== */
 .already-completed {
-background: #E8F5E9;
-padding: 20px;
-border-radius: 10px;
-text-align: center;
-margin-bottom: 15px;
+  background: #E8F5E9;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 15px;
 }
 
 .undo-btn {
-margin-top: 12px;
-font-size: 0.85rem;
-background: #fff;
-border: 1px solid #ccc;
-padding: 8px 16px;
-border-radius: 6px;
-cursor: pointer;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 /* ========================================
-履歴画面
+   履歴画面
 ======================================== */
 .history-item {
-background: #fff;
-border: 1px solid #E5E2DC;
-border-radius: 10px;
-padding: 15px;
-margin-bottom: 10px;
+  background: #fff;
+  border: 1px solid #E5E2DC;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
 }
 
 .history-date {
-font-weight: 600;
-margin-bottom: 4px;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .history-shift {
-font-size: 0.85rem;
-color: #6b6b6b;
-margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  margin-bottom: 8px;
 }
 
 .history-status {
-display: flex;
-align-items: center;
-gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .badge {
-padding: 4px 10px;
-border-radius: 4px;
-font-size: 0.8rem;
-font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .badge.complete {
-background: #C8E6C9;
-color: #2E7D32;
+  background: #C8E6C9;
+  color: #2E7D32;
 }
 
 .badge.incomplete {
-background: #FFF3CD;
-color: #856404;
+  background: #FFF3CD;
+  color: #856404;
 }
 
 .history-meta {
-font-size: 0.8rem;
-color: #9b9b9b;
+  font-size: 0.8rem;
+  color: #9b9b9b;
 }
 
 .history-details {
-margin-top: 10px;
+  margin-top: 10px;
 }
 
 .history-details summary {
-font-size: 0.85rem;
-color: #6b6b6b;
-cursor: pointer;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  cursor: pointer;
 }
 
 .history-details ul {
-margin-top: 8px;
-padding-left: 20px;
+  margin-top: 8px;
+  padding-left: 20px;
 }
 
 .history-details li {
-font-size: 0.85rem;
-color: #6b6b6b;
-margin-bottom: 2px;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  margin-bottom: 2px;
 }
 
 .history-details li.checked {
-color: #2E7D32;
+  color: #2E7D32;
 }
 
 .no-history {
-text-align: center;
-color: #9b9b9b;
-padding: 40px 0;
+  text-align: center;
+  color: #9b9b9b;
+  padding: 40px 0;
 }
 
 .backup-section {
-background: #E8F5E9;
-border: 1px solid #C8E6C9;
-border-radius: 10px;
-padding: 16px;
-margin-top: 20px;
+  background: #E8F5E9;
+  border: 1px solid #C8E6C9;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 20px;
 }
 
 .backup-section h4 {
-font-size: 0.9rem;
-margin-bottom: 12px;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
 }
 
 .backup-buttons {
-display: flex;
-flex-direction: column;
-gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .backup-btn,
 .restore-btn {
-padding: 12px;
-border: 1px solid #C8E6C9;
-border-radius: 8px;
-font-size: 0.85rem;
-cursor: pointer;
-text-align: center;
+  padding: 12px;
+  border: 1px solid #C8E6C9;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: center;
 }
 
 .backup-btn {
-background: #fff;
+  background: #fff;
 }
 
 .restore-btn {
-background: #E8E4DB;
+  background: #E8E4DB;
 }
 
 .reset-btn {
-width: 100%;
-padding: 14px;
-background: transparent;
-color: #C53030;
-border: 1px solid #FCC;
-border-radius: 8px;
-font-size: 0.9rem;
-cursor: pointer;
-margin-top: 20px;
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: #C53030;
+  border: 1px solid #FCC;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 20px;
 }
 
 /* ========================================
-モーダル
+   モーダル
 ======================================== */
 .modal-overlay {
-display: none;
-position: fixed;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background: rgba(0, 0, 0, 0.5);
-z-index: 200;
-align-items: center;
-justify-content: center;
-padding: 20px;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
 .modal-overlay.show {
-display: flex;
+  display: flex;
 }
 
 .modal {
-background: #fff;
-border-radius: 16px;
-padding: 24px;
-width: 100%;
-max-width: 400px;
-max-height: 90vh;
-overflow-y: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal h3 {
-margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
-.modal input[type=“text”],
-.modal input[type=“time”] {
-width: 100%;
-padding: 12px;
-border: 1px solid #E5E2DC;
-border-radius: 8px;
-font-size: 16px;
-margin-bottom: 12px;
+.modal input[type="text"],
+.modal input[type="time"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #E5E2DC;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 12px;
 }
 
 .modal-buttons {
-display: flex;
-gap: 12px;
-margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .modal-cancel,
 .modal-confirm {
-flex: 1;
-padding: 12px;
-border-radius: 8px;
-font-size: 0.9rem;
-font-weight: 500;
-cursor: pointer;
-border: none;
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
 }
 
 .modal-cancel {
-background: #E8E4DB;
-color: #6b6b6b;
+  background: #E8E4DB;
+  color: #6b6b6b;
 }
 
 .modal-confirm {
-background: #2E7D32;
-color: #fff;
+  background: #2E7D32;
+  color: #fff;
 }
 
 .modal-danger {
-background: #C53030;
-color: #fff;
+  background: #C53030;
+  color: #fff;
 }
 
 /* ========================================
-シフト管理
+   シフト管理
 ======================================== */
 .shift-manage-list {
-list-style: none;
-margin-bottom: 16px;
+  list-style: none;
+  margin-bottom: 16px;
 }
 
 .shift-manage-item {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 12px;
-background: #fff;
-border: 1px solid #E5E2DC;
-border-radius: 8px;
-margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #E5E2DC;
+  border-radius: 8px;
+  margin-bottom: 8px;
 }
 
 .shift-manage-item .shift-info {
-flex: 1;
+  flex: 1;
 }
 
 .shift-manage-item .shift-name {
-font-weight: 500;
+  font-weight: 500;
 }
 
 .shift-manage-item .shift-time {
-font-size: 0.85rem;
-color: #6b6b6b;
+  font-size: 0.85rem;
+  color: #6b6b6b;
 }
 
 .shift-manage-item .shift-actions {
-display: flex;
-gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
 .shift-edit-btn,
 .shift-delete-btn {
-padding: 6px 12px;
-border: none;
-border-radius: 6px;
-font-size: 0.8rem;
-cursor: pointer;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
 }
 
 .shift-edit-btn {
-background: #E8E4DB;
-color: #6b6b6b;
+  background: #E8E4DB;
+  color: #6b6b6b;
 }
 
 .shift-delete-btn {
-background: #FEE;
-color: #C53030;
+  background: #FEE;
+  color: #C53030;
 }
 
 /* ========================================
-完了メッセージ
+   完了メッセージ
 ======================================== */
 .completion-message {
-display: none;
-position: fixed;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background: #FAF9F6;
-z-index: 300;
-justify-content: center;
-align-items: center;
-flex-direction: column;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #FAF9F6;
+  z-index: 300;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .completion-message.show {
-display: flex;
-animation: fadeIn 0.3s;
+  display: flex;
+  animation: fadeIn 0.3s;
 }
 
 .completion-message .icon {
-font-size: 64px;
-color: #2E7D32;
-margin-bottom: 20px;
+  font-size: 64px;
+  color: #2E7D32;
+  margin-bottom: 20px;
 }
 
 .completion-message h2 {
-margin-bottom: 8px;
+  margin-bottom: 8px;
 }
 
 .completion-message p {
-color: #6b6b6b;
+  color: #6b6b6b;
 }
 
 @keyframes fadeIn {
-from { opacity: 0; }
-to { opacity: 1; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* 空状態 */
 .empty-state {
-text-align: center;
-padding: 40px 20px;
-color: #9b9b9b;
+  text-align: center;
+  padding: 40px 20px;
+  color: #9b9b9b;
 }
 
 .empty-state p {
-margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 </style>
-
 </head>
 <body>
 
@@ -924,7 +922,6 @@ margin-bottom: 16px;
   </div>
 
   <!-- メイン画面 -->
-
   <div id="mainScreen" class="main-screen">
     <div class="nav-tabs">
       <button class="tab active" data-tab="check">チェック</button>
@@ -932,75 +929,71 @@ margin-bottom: 16px;
       <button class="tab" data-tab="history">履歴</button>
     </div>
 
-```
-<!-- チェックパネル -->
-<div id="checkPanel" class="panel active">
-  <div class="shift-header">
-    <span>
-      <span class="current-shift" id="currentShiftName"></span>
-      <span class="current-shift-time" id="currentShiftTime"></span>
-    </span>
-    <button class="change-btn" id="changeShiftBtn">変更</button>
-  </div>
-  <div id="alreadyCompleted" class="already-completed" style="display:none;">
-    ✓ 本日の業務は完了しています<br>
-    <span style="font-size:0.85rem; color:#666;">明日になるとリセットされます</span>
-    <br>
-    <button class="undo-btn" id="undoCompleteBtn">修正する</button>
-  </div>
-  <div class="progress-section" id="progressSection">
-    <div class="progress-bar"><div id="progressFill" class="progress-fill" style="width:0%"></div></div>
-    <div id="progressText" class="progress-text">0/0</div>
-  </div>
-  <div id="checklist" class="checklist"></div>
-  <button id="completeBtn" class="complete-btn" disabled>完了</button>
-</div>
-
-<!-- 編集パネル -->
-<div id="editPanel" class="panel">
-  <div id="editShiftTabs" class="edit-shift-tabs"></div>
-  <div class="add-item-section">
-    <input type="text" id="newItemText" placeholder="新しい項目を入力...">
-    <div class="day-select" id="newItemDays">
-      <label><input type="checkbox" value="毎日" checked><span>毎日</span></label>
-      <label><input type="checkbox" value="月"><span>月</span></label>
-      <label><input type="checkbox" value="火"><span>火</span></label>
-      <label><input type="checkbox" value="水"><span>水</span></label>
-      <label><input type="checkbox" value="木"><span>木</span></label>
-      <label><input type="checkbox" value="金"><span>金</span></label>
-      <label><input type="checkbox" value="土"><span>土</span></label>
-      <label><input type="checkbox" value="日"><span>日</span></label>
+    <!-- チェックパネル -->
+    <div id="checkPanel" class="panel active">
+      <div class="shift-header">
+        <span>
+          <span class="current-shift" id="currentShiftName"></span>
+          <span class="current-shift-time" id="currentShiftTime"></span>
+        </span>
+        <button class="change-btn" id="changeShiftBtn">変更</button>
+      </div>
+      <div id="alreadyCompleted" class="already-completed" style="display:none;">
+        ✓ 本日の業務は完了しています<br>
+        <span style="font-size:0.85rem; color:#666;">明日になるとリセットされます</span>
+        <br>
+        <button class="undo-btn" id="undoCompleteBtn">修正する</button>
+      </div>
+      <div class="progress-section" id="progressSection">
+        <div class="progress-bar"><div id="progressFill" class="progress-fill" style="width:0%"></div></div>
+        <div id="progressText" class="progress-text">0/0</div>
+      </div>
+      <div id="checklist" class="checklist"></div>
+      <button id="completeBtn" class="complete-btn" disabled>完了</button>
     </div>
-    <div class="date-input-row">
-      <span>特定日（毎月）:</span>
-      <input type="number" id="newItemDate" min="1" max="31" placeholder="-">
-      <span>日</span>
-    </div>
-    <button class="add-btn" id="addItemBtn">追加</button>
-  </div>
-  <h3 style="margin-bottom:12px; font-size:1rem;">項目一覧</h3>
-  <ul id="editList" class="edit-list"></ul>
-</div>
 
-<!-- 履歴パネル -->
-<div id="historyPanel" class="panel">
-  <div id="historyList"></div>
-  <div class="backup-section">
-    <h4>バックアップ・復元</h4>
-    <div class="backup-buttons">
-      <button class="backup-btn" id="exportBackupBtn">📤 バックアップをコピー</button>
-      <button class="restore-btn" id="showRestoreBtn">📥 バックアップから復元</button>
+    <!-- 編集パネル -->
+    <div id="editPanel" class="panel">
+      <div id="editShiftTabs" class="edit-shift-tabs"></div>
+      <div class="add-item-section">
+        <input type="text" id="newItemText" placeholder="新しい項目を入力...">
+        <div class="day-select" id="newItemDays">
+          <label><input type="checkbox" value="毎日" checked><span>毎日</span></label>
+          <label><input type="checkbox" value="月"><span>月</span></label>
+          <label><input type="checkbox" value="火"><span>火</span></label>
+          <label><input type="checkbox" value="水"><span>水</span></label>
+          <label><input type="checkbox" value="木"><span>木</span></label>
+          <label><input type="checkbox" value="金"><span>金</span></label>
+          <label><input type="checkbox" value="土"><span>土</span></label>
+          <label><input type="checkbox" value="日"><span>日</span></label>
+        </div>
+        <div class="date-input-row">
+          <span>特定日（毎月）:</span>
+          <input type="number" id="newItemDate" min="1" max="31" placeholder="-">
+          <span>日</span>
+        </div>
+        <button class="add-btn" id="addItemBtn">追加</button>
+      </div>
+      <h3 style="margin-bottom:12px; font-size:1rem;">項目一覧</h3>
+      <ul id="editList" class="edit-list"></ul>
     </div>
-  </div>
-  <button class="reset-btn" id="resetHistoryBtn">履歴をクリア</button>
-</div>
-```
 
+    <!-- 履歴パネル -->
+    <div id="historyPanel" class="panel">
+      <div id="historyList"></div>
+      <div class="backup-section">
+        <h4>バックアップ・復元</h4>
+        <div class="backup-buttons">
+          <button class="backup-btn" id="exportBackupBtn">📤 バックアップをコピー</button>
+          <button class="restore-btn" id="showRestoreBtn">📥 バックアップから復元</button>
+        </div>
+      </div>
+      <button class="reset-btn" id="resetHistoryBtn">履歴をクリア</button>
+    </div>
   </div>
 </div>
 
 <!-- シフト追加/編集モーダル -->
-
 <div id="shiftModal" class="modal-overlay">
   <div class="modal">
     <h3 id="shiftModalTitle">シフトを追加</h3>
@@ -1023,7 +1016,6 @@ margin-bottom: 16px;
 </div>
 
 <!-- シフト管理モーダル -->
-
 <div id="manageShiftsModal" class="modal-overlay">
   <div class="modal">
     <h3>シフト管理</h3>
@@ -1035,7 +1027,6 @@ margin-bottom: 16px;
 </div>
 
 <!-- 項目編集モーダル -->
-
 <div id="editModal" class="modal-overlay">
   <div class="modal">
     <h3>項目を編集</h3>
@@ -1054,7 +1045,6 @@ margin-bottom: 16px;
 </div>
 
 <!-- 削除確認モーダル -->
-
 <div id="deleteConfirmModal" class="modal-overlay">
   <div class="modal">
     <h3>⚠️ シフトを削除</h3>
@@ -1067,7 +1057,6 @@ margin-bottom: 16px;
 </div>
 
 <!-- 完了メッセージ -->
-
 <div id="completionMessage" class="completion-message">
   <div class="icon">✓</div>
   <h2>完了しました</h2>
