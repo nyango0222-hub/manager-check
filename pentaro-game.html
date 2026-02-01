@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🐧 ぺんたろうゲーム</title>
+  <script src="[https://unpkg.com/react@18/umd/react.production.min.js](https://unpkg.com/react@18/umd/react.production.min.js)"></script>
+  <script src="[https://unpkg.com/react-dom@18/umd/react-dom.production.min.js](https://unpkg.com/react-dom@18/umd/react-dom.production.min.js)"></script>
+  <script src="[https://unpkg.com/@babel/standalone/babel.min.js](https://unpkg.com/@babel/standalone/babel.min.js)"></script>
+  <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { overflow-x: hidden; touch-action: manipulation; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0) rotate(0); }
+      10% { transform: translateX(-8px) rotate(-2deg); }
+      20% { transform: translateX(8px) rotate(2deg); }
+      30% { transform: translateX(-6px) rotate(-1deg); }
+      40% { transform: translateX(6px) rotate(1deg); }
+      50% { transform: translateX(-4px) rotate(-0.5deg); }
+      60% { transform: translateX(4px) rotate(0.5deg); }
+    }
+    .animate-shake { animation: shake 0.5s ease-in-out; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback, memo } = React;
+
+    const CONTAINER_WIDTH = 350;
+    const CONTAINER_HEIGHT = 500;
+    const WALL_THICKNESS = 12;
+    const GAME_OVER_LINE = 100;
+    const DROP_Y = 50;
+    const PUNCH_COST = 50;
+    const GRAVITY = 0.35;
+    const FRICTION = 0.75;
+    const BOUNCE = 0.3;
+
+    const PENTARO_STAGES = [
+      { name: 'たまご', size: 30, color: '#E8F4F8', score: 1 },
+      { name: 'ひよこぺんたろう', size: 45, color: '#B8E4F0', score: 3 },
+      { name: 'こぺんたろう', size: 60, color: '#87CEEB', score: 6 },
+      { name: 'ぺんたろう', size: 80, color: '#5BC0DE', score: 10 },
+      { name: 'おおぺんたろう', size: 100, color: '#3498DB', score: 15 },
+      { name: 'キングぺんたろう', size: 130, color: '#2980B9', score: 21 },
+      { name: 'エンペラーぺんたろう', size: 160, color: '#1A5276', score: 28 },
+    ];
+
+    const storage = {
+      get: (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } },
+      set: (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} }
+    };
+
+    const Pentaro = memo(({ x, y, stage, rotation = 0 }) => {
+      const { size, color } = PENTARO_STAGES[stage];
+      const r = size / 2;
+      if (stage === 0) {
+        return (<g transform={`translate(${x},${y}) rotate(${rotation})`}>
+          <ellipse cx="0" cy="0" rx={r*0.8} ry={r} fill="#FFF8E7" stroke="#3D3122" strokeWidth="2"/>
+        </g>);
+      }
+      const s = size / 80, outline = "#3B2417", sw = 3;
+      const isKing = stage >= 5, isEmperor = stage >= 6;
+      return (<g transform={`translate(${x},${y}) rotate(${rotation}) scale(${s})`}>
+        <path d="M-20 -5 Q-45 -20 -50 -5 Q-55 10 -40 15 Q-25 18 -20 10 Z" fill={color} stroke={outline} strokeWidth={sw}/>
+        <path d="M20 0 Q40 5 45 15 Q50 30 40 35 Q25 38 20 25 Z" fill={color} stroke={outline} strokeWidth={sw}/>
+        <path d="M0 -45 C-35 -45 -40 -20 -38 5 C-36 25 -30 40 -15 45 L15 45 C30 40 36 25 38 5 C40 -20 35 -45 0 -45 Z" fill={color} stroke={outline} strokeWidth={sw}/>
+        <ellipse cx="0" cy="15" rx="22" ry="28" fill="white"/>
+        <ellipse cx="0" cy="-18" rx="22" ry="20" fill="white"/>
+        <circle cx="-10" cy="-22" r="5" fill={outline}/><circle cx="10" cy="-22" r="5" fill={outline}/>
+        <ellipse cx="0" cy="-8" rx="8" ry="5" fill="#FFAA33" stroke={outline} strokeWidth="2"/>
+        <ellipse cx="0" cy="-5" rx="5" ry="3" fill="#FF7777"/>
+        <g transform="translate(0,8)">
+          <path d="M-4 0 C-8 -8 -18 -8 -18 0 C-18 8 -8 8 -4 0" fill="#E54C4C" stroke={outline} strokeWidth="2"/>
+          <path d="M4 0 C8 -8 18 -8 18 0 C18 8 8 8 4 0" fill="#E54C4C" stroke={outline} strokeWidth="2"/>
+          <rect x="-5" y="-5" width="10" height="10" rx="2" fill="#C43C3C" stroke={outline} strokeWidth="2"/>
+        </g>
+        <ellipse cx="-15" cy="48" rx="12" ry="6" fill="#FFAA33" stroke={outline} strokeWidth="2.5"/>
+        <ellipse cx="15" cy="48" rx="12" ry="6" fill="#FFAA33" stroke={outline} strokeWidth="2.5"/>
+        {isKing && <g transform="translate(0,-55)">
+          <path d="M-18 12 L-22 -5 L-12 3 L0 -12 L12 3 L22 -5 L18 12 Z" fill={isEmperor?"#FFD700":"#FFC107"} stroke={outline} strokeWidth="2.5"/>
+          <circle cx="0" cy="-6" r="4" fill={isEmperor?"#E74C3C":"#FF5722"}/><circle cx="-12" cy="2" r="3" fill="#4A90D9"/><circle cx="12" cy="2" r="3" fill="#4A90D9"/>
+        </g>}
+      </g>);
+    });
+
+    function PentaroGame() {
+      const [score, setScore] = useState(0);
+      const [highScore, setHighScore] = useState(0);
+      const [nextStage, setNextStage] = useState(Math.floor(Math.random()*4));
+      const [dropX, setDropX] = useState(CONTAINER_WIDTH/2);
+      const [gameStarted, setGameStarted] = useState(false);
+      const [gameOver, setGameOver] = useState(false);
+      const [, setRender] = useState(0);
+      const [mergeEffects, setMergeEffects] = useState([]);
+      const [isShaking, setIsShaking] = useState(false);
+      const [showPunch, setShowPunch] = useState(false);
+      const [punchReady, setPunchReady] = useState(false);
+      const [punchCharge, setPunchCharge] = useState(0);
+      const [rankings, setRankings] = useState([]);
+      const [showNameInput, setShowNameInput] = useState(false);
+      const [playerName, setPlayerName] = useState('');
+
+      const containerRef = useRef(null);
+      const balls = useRef([]);
+      const nextId = useRef(0);
+      const canDrop = useRef(true);
+      const isGameOver = useRef(false);
+      const currentScore = useRef(0);
+      const animRef = useRef(null);
+      const lastTime = useRef(0);
+      const mergeQueue = useRef([]);
+      const scoreQueue = useRef(0);
+
+      useEffect(() => { currentScore.current = score; }, [score]);
+      useEffect(() => { isGameOver.current = gameOver; }, [gameOver]);
+      useEffect(() => {
+        setRankings(storage.get('pentaro-rankings') || []);
+        setHighScore(storage.get('pentaro-highscore') || 0);
+      }, []);
+
+      const getR = (st) => PENTARO_STAGES[st].size / 2 * 0.9;
+
+      useEffect(() => {
+        const loop = (time) => {
+          if (isGameOver.current) { animRef.current = requestAnimationFrame(loop); return; }
+          const dt = lastTime.current ? Math.min((time - lastTime.current) / 16.67, 2) : 1;
+          lastTime.current = time;
+          const bs = balls.current, now = Date.now();
+
+          for (const b of bs) {
+            const r = getR(b.stage);
+            b.vy += GRAVITY * dt;
+            const spd = Math.hypot(b.vx, b.vy);
+            if (spd > 12) { b.vx = b.vx/spd*12; b.vy = b.vy/spd*12; }
+            b.x += b.vx * dt; b.y += b.vy * dt;
+            b.rotation += b.rotationSpeed * dt; b.rotationSpeed *= 0.95;
+            if (b.x - r < WALL_THICKNESS) { b.x = WALL_THICKNESS + r; b.vx = Math.abs(b.vx)*BOUNCE; b.rotationSpeed += b.vy*0.02; }
+            if (b.x + r > CONTAINER_WIDTH - WALL_THICKNESS) { b.x = CONTAINER_WIDTH - WALL_THICKNESS - r; b.vx = -Math.abs(b.vx)*BOUNCE; b.rotationSpeed -= b.vy*0.02; }
+            if (b.y + r > CONTAINER_HEIGHT - WALL_THICKNESS) { b.y = CONTAINER_HEIGHT - WALL_THICKNESS - r; b.vy = -Math.abs(b.vy)*BOUNCE; b.vx *= FRICTION; b.rotationSpeed = b.vx*0.05; if(Math.abs(b.vy)<0.5)b.vy=0; if(Math.abs(b.vx)<0.1)b.vx=0; }
+          }
+
+          const rm = new Set(), add = [];
+          for (let it = 0; it < 8; it++) {
+            for (let i = 0; i < bs.length; i++) {
+              if (rm.has(i)) continue;
+              for (let j = i+1; j < bs.length; j++) {
+                if (rm.has(j)) continue;
+                const a = bs[i], b = bs[j], r1 = getR(a.stage), r2 = getR(b.stage);
+                const dx = b.x - a.x, dy = b.y - a.y, dist = Math.hypot(dx, dy), minD = r1 + r2;
+                if (dist < minD && dist > 0) {
+                  if (a.stage === b.stage && !rm.has(i) && !rm.has(j)) {
+                    const nx = (a.x+b.x)/2, ny = (a.y+b.y)/2;
+                    if (a.stage === PENTARO_STAGES.length - 1) {
+                      rm.add(i); rm.add(j); scoreQueue.current += 100;
+                      mergeQueue.current.push({x:nx,y:ny,stage:a.stage,isVanish:true});
+                    } else {
+                      rm.add(i); rm.add(j);
+                      const ns = a.stage + 1;
+                      add.push({id:nextId.current++,x:nx,y:ny,vx:(a.vx+b.vx)/2,vy:Math.min((a.vy+b.vy)/2-2,-1),stage:ns,rotation:(a.rotation+b.rotation)/2,rotationSpeed:(a.rotationSpeed+b.rotationSpeed)/2,createdAt:now});
+                      scoreQueue.current += PENTARO_STAGES[ns].score;
+                      mergeQueue.current.push({x:nx,y:ny,stage:ns,isVanish:false});
+                    }
+                  } else {
+                    const nx = dx/dist, ny = dy/dist, ol = minD - dist;
+                    const tot = r1+r2, rt1 = r2/tot, rt2 = r1/tot;
+                    a.x -= nx*ol*rt1; a.y -= ny*ol*rt1; b.x += nx*ol*rt2; b.y += ny*ol*rt2;
+                    const dvn = (a.vx-b.vx)*nx + (a.vy-b.vy)*ny;
+                    if (dvn > 0) { a.vx -= dvn*nx*rt1*0.8; a.vy -= dvn*ny*rt1*0.8; b.vx += dvn*nx*rt2*0.8; b.vy += dvn*ny*rt2*0.8; a.rotationSpeed += (b.vx-a.vx)*0.02; b.rotationSpeed += (a.vx-b.vx)*0.02; }
+                  }
+                }
+              }
+            }
+          }
+          if (rm.size || add.length) balls.current = bs.filter((_,i) => !rm.has(i)).concat(add);
+
+          if (scoreQueue.current > 0) {
+            const addS = scoreQueue.current; scoreQueue.current = 0;
+            setScore(p => p + addS);
+            setPunchCharge(p => { const n = p + addS; if (n >= PUNCH_COST) setPunchReady(true); return n; });
+          }
+          if (mergeQueue.current.length) {
+            const effs = mergeQueue.current.map(e => ({...e, id: Date.now()+Math.random()}));
+            mergeQueue.current = [];
+            setMergeEffects(p => [...p, ...effs]);
+          }
+
+          for (const b of balls.current) {
+            const r = getR(b.stage);
+            if (b.y - r < GAME_OVER_LINE && Math.abs(b.vy) < 1 && Math.abs(b.vx) < 1 && now - b.createdAt > 2000) {
+              isGameOver.current = true; setGameOver(true); setShowNameInput(true);
+              if (currentScore.current > (storage.get('pentaro-highscore')||0)) { storage.set('pentaro-highscore', currentScore.current); setHighScore(currentScore.current); }
+              break;
+            }
+          }
+          setRender(p => p + 1);
+          animRef.current = requestAnimationFrame(loop);
+        };
+        animRef.current = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(animRef.current);
+      }, []);
+
+      const drop = useCallback(() => {
+        if (gameOver || !canDrop.current) return;
+        if (!gameStarted) setGameStarted(true);
+        canDrop.current = false;
+        const st = nextStage, r = getR(st);
+        balls.current.push({id:nextId.current++,x:dropX,y:DROP_Y+r,vx:0,vy:0,stage:st,rotation:0,rotationSpeed:0,createdAt:Date.now()});
+        setNextStage(Math.floor(Math.random()*4));
+        setTimeout(() => canDrop.current = true, 400);
+      }, [dropX, nextStage, gameOver, gameStarted]);
+
+      const handleMove = useCallback((cx) => {
+        if (!containerRef.current || gameOver) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        setDropX(Math.max(50, Math.min(CONTAINER_WIDTH - 50, cx - rect.left)));
+      }, [gameOver]);
+
+      const punch = useCallback(() => {
+        if (!punchReady || gameOver || !gameStarted) return;
+        setPunchReady(false);
+        setPunchCharge(p => { const n = p - PUNCH_COST; if (n >= PUNCH_COST) setPunchReady(true); return n; });
+        setIsShaking(true); setShowPunch(true);
+        for (const b of balls.current) { b.vx += (Math.random()-0.5)*15; b.vy -= Math.random()*8+3; b.rotationSpeed += (Math.random()-0.5)*8; }
+        setTimeout(() => setIsShaking(false), 500);
+        setTimeout(() => setShowPunch(false), 800);
+      }, [punchReady, gameOver, gameStarted]);
+
+      const restart = useCallback(() => {
+        balls.current = []; setScore(0); currentScore.current = 0; setGameOver(false); isGameOver.current = false;
+        setGameStarted(false); setNextStage(Math.floor(Math.random()*4)); setDropX(CONTAINER_WIDTH/2);
+        canDrop.current = true; setPunchReady(false); setPunchCharge(0); setMergeEffects([]);
+      }, []);
+
+      const saveScore = () => {
+        const name = playerName.trim() || 'ななし';
+        const nr = [...rankings, {name, score, date: Date.now()}].sort((a,b) => b.score - a.score).slice(0,10);
+        setRankings(nr); storage.set('pentaro-rankings', nr); setShowNameInput(false); setPlayerName('');
+      };
+
+      useEffect(() => { if (mergeEffects.length) { const t = setTimeout(() => setMergeEffects(p => p.slice(1)), 600); return () => clearTimeout(t); } }, [mergeEffects]);
+
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-sky-200 to-sky-400 flex flex-col items-center justify-center p-4">
+          <h1 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">🐧 ぺんたろうゲーム 🐧</h1>
+          <div className="flex gap-4 mb-2">
+            <div className="bg-white/80 rounded-lg px-3 py-1 shadow"><span className="text-gray-600 text-xs">スコア</span><p className="text-xl font-bold text-blue-600">{score}</p></div>
+            <div className="bg-white/80 rounded-lg px-3 py-1 shadow"><span className="text-gray-600 text-xs">ハイスコア</span><p className="text-xl font-bold text-purple-600">{highScore}</p></div>
+          </div>
+          <div className="mb-2 flex items-center gap-2">
+            <button onClick={punch} disabled={!punchReady||gameOver} className={`px-3 py-1 rounded-full font-bold text-white shadow transition-all ${punchReady&&!gameOver?'bg-pink-500 hover:bg-pink-600 animate-pulse':'bg-gray-400'}`}>👊 みゆちゃんパンチ！</button>
+            <div className="bg-white/80 rounded-full px-2 py-1 text-xs"><span className={`font-bold ${punchCharge>=PUNCH_COST?'text-pink-500':'text-gray-600'}`}>{Math.min(punchCharge,PUNCH_COST)}/{PUNCH_COST}</span></div>
+          </div>
+          <div className="bg-white/80 rounded-lg px-3 py-1 mb-2 shadow flex items-center gap-2">
+            <span className="text-gray-600 text-xs">次:</span>
+            <svg width="40" height="40" viewBox="-20 -20 40 40"><Pentaro x={0} y={0} stage={nextStage}/></svg>
+            <span className="text-xs">{PENTARO_STAGES[nextStage].name}</span>
+          </div>
+          <div ref={containerRef} className={`relative bg-sky-100 rounded-lg shadow-xl cursor-pointer select-none overflow-hidden ${isShaking?'animate-shake':''}`} style={{width:CONTAINER_WIDTH,height:CONTAINER_HEIGHT,touchAction:'none'}}
+               onMouseMove={e => handleMove(e.clientX)} onTouchMove={e => {e.preventDefault(); handleMove(e.touches[0]?.clientX);}} onClick={drop} onTouchEnd={e => {e.preventDefault(); drop();}}>
+            {showPunch && <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center"><div className="text-5xl animate-bounce">👊💥</div></div>}
+            <svg width={CONTAINER_WIDTH} height={CONTAINER_HEIGHT}>
+              <rect x="0" y="50" width={WALL_THICKNESS} height={CONTAINER_HEIGHT-50} fill="#8B4513"/>
+              <rect x={CONTAINER_WIDTH-WALL_THICKNESS} y="50" width={WALL_THICKNESS} height={CONTAINER_HEIGHT-50} fill="#8B4513"/>
+              <rect x="0" y={CONTAINER_HEIGHT-WALL_THICKNESS} width={CONTAINER_WIDTH} height={WALL_THICKNESS} fill="#8B4513"/>
+              <line x1={WALL_THICKNESS} y1={GAME_OVER_LINE} x2={CONTAINER_WIDTH-WALL_THICKNESS} y2={GAME_OVER_LINE} stroke="red" strokeWidth="2" strokeDasharray="10,5" opacity="0.5"/>
+              {!gameOver && <>
+                <line x1={dropX} y1={DROP_Y} x2={dropX} y2={CONTAINER_HEIGHT-WALL_THICKNESS} stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeDasharray="5,5"/>
+                <g transform={`translate(${dropX},${DROP_Y})`}><Pentaro x={0} y={0} stage={nextStage}/></g>
+              </>}
+              {balls.current.map(b => <Pentaro key={b.id} x={b.x} y={b.y} stage={b.stage} rotation={b.rotation}/>)}
+              {mergeEffects.map(e => <g key={e.id}>
+                {e.isVanish ? <>
+                  <circle cx={e.x} cy={e.y} r={PENTARO_STAGES[e.stage].size/2} fill="none" stroke="#FF69B4" strokeWidth="4"><animate attributeName="r" from={PENTARO_STAGES[e.stage].size/2} to={PENTARO_STAGES[e.stage].size} dur="0.6s"/><animate attributeName="opacity" from="1" to="0" dur="0.6s"/></circle>
+                  <text x={e.x} y={e.y} textAnchor="middle" fill="#FF69B4" fontSize="18" fontWeight="bold">+100<animate attributeName="y" from={e.y} to={e.y-40} dur="0.6s"/><animate attributeName="opacity" from="1" to="0" dur="0.6s"/></text>
+                </> : <>
+                  <circle cx={e.x} cy={e.y} r={PENTARO_STAGES[e.stage].size/2+10} fill="none" stroke="#FFD700" strokeWidth="3"><animate attributeName="r" from={PENTARO_STAGES[e.stage].size/2} to={PENTARO_STAGES[e.stage].size/2+30} dur="0.5s"/><animate attributeName="opacity" from="0.8" to="0" dur="0.5s"/></circle>
+                  <text x={e.x} y={e.y-PENTARO_STAGES[e.stage].size/2-10} textAnchor="middle" fill="#FFD700" fontSize="14" fontWeight="bold">+{PENTARO_STAGES[e.stage].score}<animate attributeName="y" from={e.y-PENTARO_STAGES[e.stage].size/2-10} to={e.y-PENTARO_STAGES[e.stage].size/2-40} dur="0.5s"/><animate attributeName="opacity" from="1" to="0" dur="0.5s"/></text>
+                </>}
+              </g>)}
+            </svg>
+            {gameOver && !showNameInput && <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center z-10">
+              <p className="text-white text-2xl font-bold mb-2">ゲームオーバー</p><p className="text-yellow-300 text-lg mb-4">スコア: {score}</p>
+              <button onClick={e => {e.stopPropagation(); restart();}} className="bg-blue-500 text-white font-bold py-2 px-6 rounded-full">もう一度遊ぶ</button>
+            </div>}
+            {!gameStarted && !gameOver && <div className="absolute inset-0 flex items-center justify-center pointer-events-none"><p className="text-white text-lg font-bold bg-black/30 px-4 py-2 rounded-lg">タップして開始！</p></div>}
+          </div>
+          <p className="text-white/80 text-xs mt-2">タップでぺんたろうを落とそう！</p>
+          <div className="mt-3 bg-white/80 rounded-lg p-2 shadow" style={{maxWidth:CONTAINER_WIDTH}}>
+            <p className="text-center font-bold text-gray-700 text-sm mb-1">🎀 ぺんたろう図鑑</p>
+            <div className="flex flex-wrap justify-center gap-1">
+              {PENTARO_STAGES.map((st,i) => <div key={i} className="flex flex-col items-center" style={{fontSize:10}}>
+                <svg width="35" height="45" viewBox={`${-50-i*10} ${-50-i*10} ${100+i*20} ${110+i*22}`}><Pentaro x={0} y={0} stage={i}/></svg>
+                <span className="text-gray-600">{st.name}</span>
+              </div>)}
+            </div>
+          </div>
+          {rankings.length > 0 && <div className="mt-3 bg-white/80 rounded-lg p-2 shadow w-64">
+            <p className="text-center font-bold text-gray-700 text-sm mb-1">🏆 ランキング</p>
+            {rankings.slice(0,5).map((r,i) => <div key={i} className="flex justify-between text-xs px-2 py-1 bg-white/50 rounded mb-1">
+              <span className="font-bold text-gray-500">{i+1}.</span><span className="flex-1 ml-2 truncate">{r.name}</span><span className="font-bold text-blue-600">{r.score}</span>
+            </div>)}
+          </div>}
+          {showNameInput && <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={e => e.stopPropagation()}>
+            <div className="bg-white rounded-lg p-5 shadow-xl max-w-xs w-full mx-4">
+              <p className="text-lg font-bold text-center text-gray-700 mb-1">🎉 ゲームオーバー！</p>
+              <p className="text-center text-xl font-bold text-blue-600 mb-3">スコア: {score}</p>
+              <input type="text" value={playerName} onChange={e => setPlayerName(e.target.value)} placeholder="なまえ" maxLength={10} className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 mb-3" autoFocus onClick={e => e.stopPropagation()}/>
+              <div className="flex gap-2">
+                <button onClick={saveScore} className="flex-1 bg-blue-500 text-white font-bold py-2 rounded-lg">登録</button>
+                <button onClick={() => {setShowNameInput(false); setPlayerName('');}} className="flex-1 bg-gray-300 text-gray-700 font-bold py-2 rounded-lg">スキップ</button>
+              </div>
+              <button onClick={() => {setShowNameInput(false); setPlayerName(''); restart();}} className="w-full mt-2 bg-green-500 text-white font-bold py-2 rounded-lg">もう一度遊ぶ</button>
+            </div>
+          </div>}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<PentaroGame/>);
+  </script>
+</body>
+</html>
