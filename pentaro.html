@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ぺんたろうゲーム</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(to bottom, #87CEEB, #5BB5E0);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+    .score-box {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+    .score-item {
+      background: rgba(255,255,255,0.85);
+      padding: 8px 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .score-label {
+      font-size: 12px;
+      color: #666;
+    }
+    .score-value {
+      font-size: 22px;
+      font-weight: bold;
+      color: #2196F3;
+    }
+    .high-score .score-value {
+      color: #9C27B0;
+    }
+    .punch-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .punch-btn {
+      background: linear-gradient(to right, #FF69B4, #FF1493);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .punch-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .punch-btn.ready {
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .charge-box {
+      background: rgba(255,255,255,0.85);
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 12px;
+    }
+    .next-box {
+      background: rgba(255,255,255,0.85);
+      padding: 8px 15px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    .game-area {
+      position: relative;
+      width: 340px;
+      height: 480px;
+      background: #B0E0FF;
+      border-radius: 10px;
+      overflow: hidden;
+      touch-action: none;
+      cursor: pointer;
+    }
+    .game-area.shake {
+      animation: shake 0.5s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .punch-effect {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 60px;
+      z-index: 100;
+      animation: bounce 0.5s;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.3); }
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+    .overlay-text {
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .overlay-score {
+      color: #FFD700;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    .restart-btn {
+      background: #2196F3;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .start-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.4);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      pointer-events: none;
+    }
+    .hint {
+      color: rgba(255,255,255,0.8);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+    }
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 300px;
+      text-align: center;
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .modal-score {
+      font-size: 26px;
+      font-weight: bold;
+      color: #2196F3;
+      margin-bottom: 15px;
+    }
+    .modal-input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .modal-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .modal-btn.primary {
+      background: #2196F3;
+      color: white;
+    }
+    .modal-btn.secondary {
+      background: #ddd;
+      color: #666;
+    }
+    .modal-btn.success {
+      background: #4CAF50;
+      color: white;
+      margin-top: 10px;
+      width: 100%;
+    }
+    .zukan {
+      background: rgba(255,255,255,0.85);
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 15px;
+      max-width: 340px;
+    }
+    .zukan-title {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .zukan-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+    }
+    .zukan-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 9px;
+    }
+    .ranking {
+      background: rgba(255,255,255,0.85);
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+      width: 250px;
+    }
+    .ranking-title {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 10px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 5px;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+    .ranking-name {
+      flex: 1;
+      margin-left: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .ranking-score {
+      font-weight: bold;
+      color: #2196F3;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback, memo } = React;
+
+    // 定数
+    const W = 340, H = 480, WALL = 12, GAMEOVER_Y = 90, DROP_Y = 45;
+    const GRAVITY = 0.35, FRICTION = 0.75, BOUNCE = 0.3, PUNCH_COST = 50;
+
+    const STAGES = [
+      { name: 'たまご', size: 28, color: '#FFF8DC' },
+      { name: 'ひよこ', size: 42, color: '#B8E4F0' },
+      { name: 'こぺんたろう', size: 56, color: '#87CEEB' },
+      { name: 'ぺんたろう', size: 75, color: '#5BC0DE' },
+      { name: 'おおぺんたろう', size: 95, color: '#3498DB' },
+      { name: 'キング', size: 120, color: '#2980B9' },
+      { name: 'エンペラー', size: 150, color: '#1A5276' },
+    ];
+    const SCORES = [1, 3, 6, 10, 15, 21, 28];
+
+    // ストレージ
+    const store = {
+      get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+      set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+    };
+
+    // ぺんたろう描画
+    const Pentaro = memo(({ x, y, stage, rot = 0 }) => {
+      const { size, color } = STAGES[stage];
+      const r = size / 2;
+      
+      // たまご
+      if (stage === 0) {
+        return (
+          <g transform={`translate(${x},${y}) rotate(${rot})`}>
+            <ellipse rx={r * 0.75} ry={r} fill="#FFF8DC" stroke="#8B7355" strokeWidth="2" />
+            <ellipse cy={-r * 0.2} rx={r * 0.25} ry={r * 0.35} fill="#FFFACD" opacity="0.6" />
+          </g>
+        );
+      }
+      
+      const sc = size / 75;
+      const outline = "#3B2417";
+      const isKing = stage >= 5;
+      const isEmp = stage >= 6;
+      
+      return (
+        <g transform={`translate(${x},${y}) rotate(${rot}) scale(${sc})`}>
+          {/* 羽 */}
+          <ellipse cx={-32} cy={5} rx={18} ry={12} fill={color} stroke={outline} strokeWidth="2.5" transform="rotate(-20)" />
+          <ellipse cx={32} cy={5} rx={18} ry={12} fill={color} stroke={outline} strokeWidth="2.5" transform="rotate(20)" />
+          {/* 体 */}
+          <ellipse cy={10} rx={28} ry={35} fill={color} stroke={outline} strokeWidth="3" />
+          {/* お腹 */}
+          <ellipse cy={15} rx={20} ry={26} fill="white" />
+          {/* 顔 */}
+          <circle cy={-22} r={22} fill="white" stroke={outline} strokeWidth="2" />
+          {/* 目 */}
+          <circle cx={-8} cy={-25} r={4} fill={outline} />
+          <circle cx={8} cy={-25} r={4} fill={outline} />
+          <circle cx={-6} cy={-26} r={1.5} fill="white" />
+          <circle cx={10} cy={-26} r={1.5} fill="white" />
+          {/* くちばし */}
+          <ellipse cy={-12} rx={7} ry={4} fill="#FFA500" stroke={outline} strokeWidth="1.5" />
+          {/* ほっぺ */}
+          <circle cx={-15} cy={-18} r={5} fill="#FFB6C1" opacity="0.6" />
+          <circle cx={15} cy={-18} r={5} fill="#FFB6C1" opacity="0.6" />
+          {/* リボン */}
+          <g transform="translate(0, 5)">
+            <path d="M-3,0 C-6,-6 -14,-6 -14,0 C-14,6 -6,6 -3,0" fill="#E53935" stroke={outline} strokeWidth="1.5" />
+            <path d="M3,0 C6,-6 14,-6 14,0 C14,6 6,6 3,0" fill="#E53935" stroke={outline} strokeWidth="1.5" />
+            <circle r={4} fill="#C62828" stroke={outline} strokeWidth="1.5" />
+          </g>
+          {/* 足 */}
+          <ellipse cx={-12} cy={43} rx={10} ry={5} fill="#FFA500" stroke={outline} strokeWidth="2" />
+          <ellipse cx={12} cy={43} rx={10} ry={5} fill="#FFA500" stroke={outline} strokeWidth="2" />
+          {/* 王冠 */}
+          {isKing && (
+            <g transform="translate(0, -48)">
+              <path d="M-15,8 L-18,-3 L-9,2 L0,-10 L9,2 L18,-3 L15,8 Z" 
+                fill={isEmp ? "#FFD700" : "#FFC107"} stroke={outline} strokeWidth="2" />
+              <circle cy={-5} r={3} fill={isEmp ? "#E53935" : "#FF5722"} />
+              <circle cx={-10} cy={1} r={2.5} fill="#42A5F5" />
+              <circle cx={10} cy={1} r={2.5} fill="#42A5F5" />
+            </g>
+          )}
+        </g>
+      );
+    });
+
+    // メインゲーム
+    function Game() {
+      const [score, setScore] = useState(0);
+      const [highScore, setHighScore] = useState(0);
+      const [next, setNext] = useState(0);
+      const [dropX, setDropX] = useState(W / 2);
+      const [started, setStarted] = useState(false);
+      const [over, setOver] = useState(false);
+      const [, render] = useState(0);
+      const [shaking, setShaking] = useState(false);
+      const [punching, setPunching] = useState(false);
+      const [punchOK, setPunchOK] = useState(false);
+      const [charge, setCharge] = useState(0);
+      const [effects, setEffects] = useState([]);
+      const [rankings, setRankings] = useState([]);
+      const [showModal, setShowModal] = useState(false);
+      const [name, setName] = useState('');
+
+      const ref = useRef(null);
+      const balls = useRef([]);
+      const idRef = useRef(0);
+      const canDrop = useRef(true);
+      const overRef = useRef(false);
+      const scoreRef = useRef(0);
+      const chargeRef = useRef(0);
+      const anim = useRef(null);
+      const lastT = useRef(0);
+
+      useEffect(() => { scoreRef.current = score; }, [score]);
+      useEffect(() => { overRef.current = over; }, [over]);
+      useEffect(() => { chargeRef.current = charge; }, [charge]);
+      
+      useEffect(() => {
+        setRankings(store.get('pentaro-rank') || []);
+        setHighScore(store.get('pentaro-high') || 0);
+        setNext(Math.floor(Math.random() * 4));
+      }, []);
+
+      const getR = st => STAGES[st].size / 2 * 0.9;
+
+      // 物理ループ
+      useEffect(() => {
+        const loop = t => {
+          if (overRef.current) { anim.current = requestAnimationFrame(loop); return; }
+          
+          const dt = lastT.current ? Math.min((t - lastT.current) / 16.67, 2) : 1;
+          lastT.current = t;
+          const bs = balls.current;
+          const now = Date.now();
+
+          // 物理演算
+          for (const b of bs) {
+            const r = getR(b.st);
+            b.vy += GRAVITY * dt;
+            const spd = Math.hypot(b.vx, b.vy);
+            if (spd > 12) { b.vx *= 12/spd; b.vy *= 12/spd; }
+            b.x += b.vx * dt;
+            b.y += b.vy * dt;
+            b.rot += b.rotSpd * dt;
+            b.rotSpd *= 0.95;
+            
+            // 壁
+            if (b.x - r < WALL) { b.x = WALL + r; b.vx = Math.abs(b.vx) * BOUNCE; b.rotSpd += b.vy * 0.02; }
+            if (b.x + r > W - WALL) { b.x = W - WALL - r; b.vx = -Math.abs(b.vx) * BOUNCE; b.rotSpd -= b.vy * 0.02; }
+            if (b.y + r > H - WALL) { 
+              b.y = H - WALL - r; 
+              b.vy = -Math.abs(b.vy) * BOUNCE; 
+              b.vx *= FRICTION;
+              b.rotSpd = b.vx * 0.05;
+              if (Math.abs(b.vy) < 0.5) b.vy = 0;
+              if (Math.abs(b.vx) < 0.1) b.vx = 0;
+            }
+          }
+
+          // 衝突
+          const del = new Set();
+          const add = [];
+          let addScore = 0;
+          const newFx = [];
+
+          for (let it = 0; it < 8; it++) {
+            for (let i = 0; i < bs.length; i++) {
+              if (del.has(i)) continue;
+              for (let j = i + 1; j < bs.length; j++) {
+                if (del.has(j)) continue;
+                const a = bs[i], b = bs[j];
+                const r1 = getR(a.st), r2 = getR(b.st);
+                const dx = b.x - a.x, dy = b.y - a.y;
+                const dist = Math.hypot(dx, dy);
+                const minD = r1 + r2;
+                
+                if (dist < minD && dist > 0) {
+                  if (a.st === b.st) {
+                    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+                    if (a.st === 6) {
+                      // エンペラー消滅
+                      del.add(i); del.add(j);
+                      addScore += 100;
+                      newFx.push({ id: Math.random(), x: mx, y: my, text: '+100', color: '#FF69B4' });
+                    } else {
+                      // 合体
+                      del.add(i); del.add(j);
+                      const ns = a.st + 1;
+                      add.push({
+                        id: idRef.current++,
+                        x: mx, y: my,
+                        vx: (a.vx + b.vx) / 2,
+                        vy: Math.min((a.vy + b.vy) / 2 - 2, -1),
+                        st: ns,
+                        rot: 0,
+                        rotSpd: (a.rotSpd + b.rotSpd) / 2,
+                        born: now
+                      });
+                      addScore += SCORES[ns];
+                      newFx.push({ id: Math.random(), x: mx, y: my, text: '+' + SCORES[ns], color: '#FFD700' });
+                    }
+                  } else {
+                    // 押し出し
+                    const nx = dx / dist, ny = dy / dist;
+                    const overlap = minD - dist;
+                    const tot = r1 + r2;
+                    const rt1 = r2 / tot, rt2 = r1 / tot;
+                    a.x -= nx * overlap * rt1;
+                    a.y -= ny * overlap * rt1;
+                    b.x += nx * overlap * rt2;
+                    b.y += ny * overlap * rt2;
+                    
+                    const dvn = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
+                    if (dvn > 0) {
+                      a.vx -= dvn * nx * rt1 * 0.8;
+                      a.vy -= dvn * ny * rt1 * 0.8;
+                      b.vx += dvn * nx * rt2 * 0.8;
+                      b.vy += dvn * ny * rt2 * 0.8;
+                      a.rotSpd += (b.vx - a.vx) * 0.02;
+                      b.rotSpd += (a.vx - b.vx) * 0.02;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          if (del.size || add.length) {
+            balls.current = bs.filter((_, i) => !del.has(i)).concat(add);
+          }
+
+          // スコア
+          if (addScore > 0) {
+            setScore(s => s + addScore);
+            setCharge(c => {
+              const nc = c + addScore;
+              if (nc >= PUNCH_COST) setPunchOK(true);
+              return nc;
+            });
+          }
+          
+          if (newFx.length) {
+            setEffects(e => [...e, ...newFx]);
+          }
+
+          // ゲームオーバー判定
+          for (const b of balls.current) {
+            const r = getR(b.st);
+            if (b.y - r < GAMEOVER_Y && Math.abs(b.vy) < 1 && Math.abs(b.vx) < 1 && now - b.born > 2000) {
+              overRef.current = true;
+              setOver(true);
+              setShowModal(true);
+              const hs = store.get('pentaro-high') || 0;
+              if (scoreRef.current > hs) {
+                store.set('pentaro-high', scoreRef.current);
+                setHighScore(scoreRef.current);
+              }
+              break;
+            }
+          }
+
+          render(n => n + 1);
+          anim.current = requestAnimationFrame(loop);
+        };
+        
+        anim.current = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(anim.current);
+      }, []);
+
+      // ドロップ
+      const drop = useCallback(() => {
+        if (over || !canDrop.current) return;
+        if (!started) setStarted(true);
+        canDrop.current = false;
+        
+        const r = getR(next);
+        balls.current.push({
+          id: idRef.current++,
+          x: dropX,
+          y: DROP_Y + r,
+          vx: 0, vy: 0,
+          st: next,
+          rot: 0,
+          rotSpd: 0,
+          born: Date.now()
+        });
+        
+        setNext(Math.floor(Math.random() * 4));
+        setTimeout(() => canDrop.current = true, 400);
+      }, [dropX, next, over, started]);
+
+      // 移動
+      const move = useCallback(cx => {
+        if (!ref.current || over) return;
+        const rect = ref.current.getBoundingClientRect();
+        setDropX(Math.max(45, Math.min(W - 45, cx - rect.left)));
+      }, [over]);
+
+      // パンチ
+      const punch = useCallback(() => {
+        if (!punchOK || over || !started) return;
+        setPunchOK(false);
+        setCharge(c => {
+          const nc = c - PUNCH_COST;
+          if (nc >= PUNCH_COST) setPunchOK(true);
+          return nc;
+        });
+        setShaking(true);
+        setPunching(true);
+        
+        for (const b of balls.current) {
+          b.vx += (Math.random() - 0.5) * 15;
+          b.vy -= Math.random() * 8 + 3;
+          b.rotSpd += (Math.random() - 0.5) * 8;
+        }
+        
+        setTimeout(() => setShaking(false), 500);
+        setTimeout(() => setPunching(false), 800);
+      }, [punchOK, over, started]);
+
+      // リスタート
+      const restart = useCallback(() => {
+        balls.current = [];
+        setScore(0);
+        setOver(false);
+        overRef.current = false;
+        setStarted(false);
+        setNext(Math.floor(Math.random() * 4));
+        setDropX(W / 2);
+        canDrop.current = true;
+        setPunchOK(false);
+        setCharge(0);
+        setEffects([]);
+        setShowModal(false);
+        setName('');
+      }, []);
+
+      // スコア保存
+      const saveRank = () => {
+        const n = name.trim() || 'ななし';
+        const nr = [...rankings, { name: n, score, date: Date.now() }]
+          .sort((a, b) => b.score - a.score).slice(0, 10);
+        setRankings(nr);
+        store.set('pentaro-rank', nr);
+        setShowModal(false);
+        setName('');
+      };
+
+      // エフェクト消去
+      useEffect(() => {
+        if (effects.length) {
+          const t = setTimeout(() => setEffects(e => e.slice(1)), 700);
+          return () => clearTimeout(t);
+        }
+      }, [effects]);
+
+      return (
+        <div className="game-container">
+          <div className="title">🐧 ぺんたろうゲーム 🐧</div>
+          
+          <div className="score-box">
+            <div className="score-item">
+              <div className="score-label">スコア</div>
+              <div className="score-value">{score}</div>
+            </div>
+            <div className="score-item high-score">
+              <div className="score-label">ハイスコア</div>
+              <div className="score-value">{highScore}</div>
+            </div>
+          </div>
+          
+          <div className="punch-area">
+            <button 
+              className={`punch-btn ${punchOK && !over ? 'ready' : ''}`}
+              onClick={punch}
+              disabled={!punchOK || over}
+            >
+              👊 みゆちゃんパンチ！
+            </button>
+            <div className="charge-box">
+              チャージ: <strong style={{color: charge >= PUNCH_COST ? '#FF69B4' : '#666'}}>
+                {Math.min(charge, PUNCH_COST)}/{PUNCH_COST}
+              </strong>
+            </div>
+          </div>
+          
+          <div className="next-box">
+            <span>次:</span>
+            <svg width="35" height="35" viewBox="-25 -25 50 50">
+              <Pentaro x={0} y={0} stage={next} />
+            </svg>
+            <span>{STAGES[next].name}</span>
+          </div>
+          
+          <div 
+            ref={ref}
+            className={`game-area ${shaking ? 'shake' : ''}`}
+            onMouseMove={e => move(e.clientX)}
+            onTouchMove={e => { e.preventDefault(); move(e.touches[0]?.clientX); }}
+            onClick={drop}
+            onTouchEnd={e => { e.preventDefault(); drop(); }}
+          >
+            {punching && <div className="punch-effect">👊💥</div>}
+            
+            <svg width={W} height={H}>
+              {/* 壁 */}
+              <rect x={0} y={40} width={WALL} height={H - 40} fill="#8B4513" />
+              <rect x={W - WALL} y={40} width={WALL} height={H - 40} fill="#8B4513" />
+              <rect x={0} y={H - WALL} width={W} height={WALL} fill="#8B4513" />
+              
+              {/* ゲームオーバーライン */}
+              <line x1={WALL} y1={GAMEOVER_Y} x2={W - WALL} y2={GAMEOVER_Y} 
+                stroke="red" strokeWidth="2" strokeDasharray="8,4" opacity="0.5" />
+              
+              {/* ガイドライン */}
+              {!over && (
+                <>
+                  <line x1={dropX} y1={DROP_Y} x2={dropX} y2={H - WALL}
+                    stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeDasharray="5,5" />
+                  <g transform={`translate(${dropX}, ${DROP_Y})`}>
+                    <Pentaro x={0} y={0} stage={next} />
+                  </g>
+                </>
+              )}
+              
+              {/* ボール */}
+              {balls.current.map(b => (
+                <Pentaro key={b.id} x={b.x} y={b.y} stage={b.st} rot={b.rot} />
+              ))}
+              
+              {/* エフェクト */}
+              {effects.map(fx => (
+                <text 
+                  key={fx.id} 
+                  x={fx.x} 
+                  y={fx.y} 
+                  textAnchor="middle" 
+                  fill={fx.color} 
+                  fontSize="18" 
+                  fontWeight="bold"
+                  style={{
+                    animation: 'fadeUp 0.7s forwards'
+                  }}
+                >
+                  {fx.text}
+                </text>
+              ))}
+            </svg>
+            
+            {!started && !over && (
+              <div className="start-text">タップして開始！</div>
+            )}
+            
+            {over && !showModal && (
+              <div className="overlay">
+                <div className="overlay-text">ゲームオーバー</div>
+                <div className="overlay-score">スコア: {score}</div>
+                <button className="restart-btn" onClick={e => { e.stopPropagation(); restart(); }}>
+                  もう一度遊ぶ
+                </button>
+              </div>
+            )}
+          </div>
+          
+          <div className="hint">タップでぺんたろうを落とそう！</div>
+          
+          <div className="zukan">
+            <div className="zukan-title">🎀 ぺんたろう図鑑</div>
+            <div className="zukan-list">
+              {STAGES.map((st, i) => (
+                <div key={i} className="zukan-item">
+                  <svg width="32" height="40" viewBox={`${-40 - i*8} ${-45 - i*8} ${80 + i*16} ${90 + i*16}`}>
+                    <Pentaro x={0} y={0} stage={i} />
+                  </svg>
+                  <span>{st.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {rankings.length > 0 && (
+            <div className="ranking">
+              <div className="ranking-title">🏆 ランキング</div>
+              {rankings.slice(0, 5).map((r, i) => (
+                <div key={i} className="ranking-item">
+                  <span>{i + 1}.</span>
+                  <span className="ranking-name">{r.name}</span>
+                  <span className="ranking-score">{r.score}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {showModal && (
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <div className="modal-content">
+                <div className="modal-title">🎉 ゲームオーバー！</div>
+                <div className="modal-score">スコア: {score}</div>
+                <input 
+                  type="text"
+                  className="modal-input"
+                  placeholder="なまえを入力"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  maxLength={10}
+                />
+                <div className="modal-buttons">
+                  <button className="modal-btn primary" onClick={saveRank}>登録</button>
+                  <button className="modal-btn secondary" onClick={() => { setShowModal(false); setName(''); }}>スキップ</button>
+                </div>
+                <button className="modal-btn success" onClick={restart}>もう一度遊ぶ</button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Game />);
+  </script>
+
+  <style>
+    @keyframes fadeUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-30px); }
+    }
+  </style>
+
+</body>
+</html>
